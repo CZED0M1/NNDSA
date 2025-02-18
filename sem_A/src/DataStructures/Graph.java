@@ -1,10 +1,10 @@
 package DataStructures;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
-public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
-    private int verticesCount=0;
-    private int edgesCount=0;
+public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializable {
     private HashMap<KVertex, Vertex<KVertex, VVertex>> vertices;
     private HashMap<KEdge, Edge<KEdge, VEdge>> edges;
 
@@ -13,12 +13,12 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
         edges = new HashMap<>();
     }
 
-    public int getVerticesCount(){
-        return verticesCount;
+    public HashMap<KVertex, Vertex<KVertex, VVertex>> getVertices(){
+        return vertices;
     }
 
-    public int getEdgesCount(){
-        return edgesCount;
+    public HashMap<KEdge, Edge<KEdge, VEdge>> getEdges(){
+        return edges;
     }
 
     public void addVertex(Vertex<KVertex, VVertex> vertex){
@@ -26,7 +26,6 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
             throw new IllegalArgumentException("Vertex with key " + vertex.getKey() + " already exists.");
         }
         vertices.put(vertex.getKey(), vertex);
-        verticesCount++;
     }
 
     public void addEdge(KVertex startKey, KVertex endKey, Edge<KEdge, VEdge> edge){
@@ -41,7 +40,12 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
             throw new IllegalArgumentException("Vertex with key " + endKey + " does not exist.");
         }
         edges.put(edge.getKey(), edge);
-        edgesCount++;
+    }
+    public void addEdge(KEdge key, Edge<KEdge, VEdge> edge){
+        if(edges.containsKey(key)){
+            throw new IllegalArgumentException("Edge with start key " +edge.getKey()+ " already exists.");
+        }
+        edges.put(edge.getKey(), edge);
     }
 
     public void removeVertex(KVertex key){
@@ -49,7 +53,6 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
             throw new IllegalArgumentException("Vertex with key " + key + " does not exist.");
         }
         vertices.remove(key);
-        verticesCount--;
     }
 
     public void removeEdge(KVertex startKey, KVertex endKey){
@@ -58,7 +61,6 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
             throw new IllegalArgumentException("Vertex with key " + key + " does not exist.");
         }
         edges.remove(key);
-        edgesCount--;
     }
 
     public Vertex<KVertex, VVertex> getVertex(KVertex key){

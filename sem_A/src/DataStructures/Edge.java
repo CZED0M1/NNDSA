@@ -1,7 +1,10 @@
 package DataStructures;
 
-public abstract class Edge<K, V>{
-    private final K key;
+
+import java.io.Serializable;
+
+public abstract class Edge<K, V> implements Serializable {
+    private K key;
     private V value;
     private boolean isOpen = true;
 
@@ -12,6 +15,10 @@ public abstract class Edge<K, V>{
 
     public K getKey(){
         return key;
+    }
+
+    public void setKey(K key) {
+        this.key = key;
     }
 
     public V getValue(){

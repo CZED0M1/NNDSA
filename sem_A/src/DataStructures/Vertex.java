@@ -1,6 +1,9 @@
 package DataStructures;
 
-public abstract class Vertex<K,V>{
+
+import java.io.Serializable;
+
+public abstract class Vertex<K,V> implements Serializable {
     private K key;
     private V value;
     private GeoLocation location;
