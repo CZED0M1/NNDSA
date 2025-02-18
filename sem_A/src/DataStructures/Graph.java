@@ -29,9 +29,16 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
         verticesCount++;
     }
 
-    public void addEdge(Edge<KEdge,VEdge> edge){
-        if(edges.containsKey(edge.getKey())){
+    public void addEdge(KVertex startKey, KVertex endKey, Edge<KEdge, VEdge> edge){
+        Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
+        if(edges.containsKey(key)){
             throw new IllegalArgumentException("Edge with start key " +edge.getKey()+ " already exists.");
+        }
+        if(!vertices.containsKey(startKey)){
+            throw new IllegalArgumentException("Vertex with key " + startKey + " does not exist.");
+        }
+        if(!vertices.containsKey(endKey)){
+            throw new IllegalArgumentException("Vertex with key " + endKey + " does not exist.");
         }
         edges.put(edge.getKey(), edge);
         edgesCount++;
@@ -45,9 +52,10 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
         verticesCount--;
     }
 
-    public void removeEdge(KEdge key){
+    public void removeEdge(KVertex startKey, KVertex endKey){
+        Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
         if(!edges.containsKey(key)){
-            throw new IllegalArgumentException("Edge with vertex key " + key + " does not exist.");
+            throw new IllegalArgumentException("Vertex with key " + key + " does not exist.");
         }
         edges.remove(key);
         edgesCount--;
@@ -60,7 +68,8 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> {
         return vertices.get(key);
     }
 
-    public Edge<KEdge, VEdge> getEdge(KEdge key){
+    public Edge<KEdge, VEdge> getEdge(KVertex startKey, KVertex endKey){
+        Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
         if(!edges.containsKey(key)){
             throw new IllegalArgumentException("Edge with start vertex key " + key + " does not exist.");
         }
