@@ -1,8 +1,5 @@
 package DataStructures;
 
-import java.util.AbstractMap;
-import java.util.Map;
-
 public abstract class Edge<K, V>{
     private final K key;
     private V value;
