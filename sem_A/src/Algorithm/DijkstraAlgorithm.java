@@ -29,26 +29,27 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
                 // Obsahuje oba krajní vrcholy
                 Map.Entry<KVertex, KVertex> edgeVertexes = (Map.Entry<KVertex, KVertex>) edge.getKey();
                 // Map.entry - K,V
-                //TODO - check otevřených cest
-                if (edgeVertexes.getKey().equals(current) || edgeVertexes.getValue().equals(current)) {
-                    // Determine the neighbor vertex
-                    KVertex neighbor;
-                    if (edgeVertexes.getKey().equals(current)) {
-                        neighbor = edgeVertexes.getValue();
-                    } else {
-                        neighbor = edgeVertexes.getKey();
-                    }
-                    // délka trasy
-                    Integer weight = (Integer) edge.getValue();
-                    // délka k sousedovi
-                    double alt = distances.get(current) + weight;
-                    if (alt < distances.get(neighbor)) {
+                if (edge.isOpen()) {
+                    if (edgeVertexes.getKey().equals(current) || edgeVertexes.getValue().equals(current)) {
+                        // Zjištění souseda
+                        KVertex neighbor;
+                        if (edgeVertexes.getKey().equals(current)) {
+                            neighbor = edgeVertexes.getValue();
+                        } else {
+                            neighbor = edgeVertexes.getKey();
+                        }
+                        // délka trasy
+                        Integer weight = (Integer) edge.getValue();
+                        // délka k sousedovi
+                        double alt = distances.get(current) + weight;
+                        if (alt < distances.get(neighbor)) {
 
-                        distances.put(neighbor, alt);
-                        previous.put(neighbor, current);
-                        // Neaktualizovalo by to hodnotu ve frontě, takže musíme ručně odebrat a znovu přidat
-                        queue.remove(neighbor);
-                        queue.add(neighbor);
+                            distances.put(neighbor, alt);
+                            previous.put(neighbor, current);
+                            // Neaktualizovalo by to hodnotu ve frontě, takže musíme ručně odebrat a znovu přidat
+                            queue.remove(neighbor);
+                            queue.add(neighbor);
+                        }
                     }
                 }
             }
@@ -63,6 +64,7 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
             if (current.equals(source)) {
                 break;
             }
+            //nastav předchůdce
             current = previous.get(current);
         }
         if (path.isEmpty() || !path.getFirst().equals(source)) {

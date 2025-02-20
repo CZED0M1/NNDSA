@@ -33,6 +33,7 @@ public class Main {
         RoadEdge roadDE = new RoadEdge("Plzeň", "Liberec", 200);
         RoadEdge test = new RoadEdge("Brno","Test",1);
         RoadEdge test2 = new RoadEdge("Test","Liberec",1);
+        test2.close();
 
         // Přidání uzlů do grafu
         graph.addVertex(cityA);
