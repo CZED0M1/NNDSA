@@ -1,8 +1,10 @@
 package DataStructures;
 
+import lombok.Data;
 
 import java.io.Serializable;
 
+@Data
 public abstract class Edge<K, V> implements Serializable {
     private K key;
     private V value;
@@ -13,21 +15,6 @@ public abstract class Edge<K, V> implements Serializable {
         this.key = key;
     }
 
-    public K getKey(){
-        return key;
-    }
-
-    public void setKey(K key) {
-        this.key = key;
-    }
-
-    public V getValue(){
-        return value;
-    }
-
-    public void setValue(V value){
-        this.value = value;
-    }
 
     public boolean isOpen(){
         return isOpen;

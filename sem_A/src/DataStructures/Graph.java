@@ -1,9 +1,12 @@
 package DataStructures;
 
-import java.io.IOException;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.*;
 
+
+@Getter
 public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializable {
     private HashMap<KVertex, Vertex<KVertex, VVertex>> vertices;
     private HashMap<KEdge, Edge<KEdge, VEdge>> edges;
@@ -11,14 +14,6 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
     public Graph(){
         vertices = new HashMap<>();
         edges = new HashMap<>();
-    }
-
-    public HashMap<KVertex, Vertex<KVertex, VVertex>> getVertices(){
-        return vertices;
-    }
-
-    public HashMap<KEdge, Edge<KEdge, VEdge>> getEdges(){
-        return edges;
     }
 
     public void addVertex(Vertex<KVertex, VVertex> vertex){
