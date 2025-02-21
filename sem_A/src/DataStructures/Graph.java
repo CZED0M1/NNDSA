@@ -2,14 +2,13 @@ package DataStructures;
 
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.util.*;
 
 
 @Getter
-public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializable {
-    private HashMap<KVertex, Vertex<KVertex, VVertex>> vertices;
-    private HashMap<KEdge, Edge<KEdge, VEdge>> edges;
+public abstract class Graph<KEdge, VEdge, KVertex, VVertex>{
+    private final HashMap<KVertex, Vertex<KVertex, VVertex>> vertices;
+    private final HashMap<KEdge, Edge<KEdge, VEdge>> edges;
 
     public Graph(){
         vertices = new HashMap<>();
@@ -25,6 +24,7 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
 
     public void addEdge(KVertex startKey, KVertex endKey, Edge<KEdge, VEdge> edge){
         Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
+        //noinspection SuspiciousMethodCalls
         if(edges.containsKey(key)){
             throw new IllegalArgumentException("Edge with start key " +edge.getKey()+ " already exists.");
         }
@@ -52,9 +52,11 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
 
     public void removeEdge(KVertex startKey, KVertex endKey){
         Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
+        //noinspection SuspiciousMethodCalls
         if(!edges.containsKey(key)){
             throw new IllegalArgumentException("Vertex with key " + key + " does not exist.");
         }
+        //noinspection SuspiciousMethodCalls
         edges.remove(key);
     }
 
@@ -67,10 +69,13 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
 
     public Edge<KEdge, VEdge> getEdge(KVertex startKey, KVertex endKey){
         Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
-        if(!edges.containsKey(key)){
+        Map.Entry<KVertex,KVertex> OppositeKey = new AbstractMap.SimpleEntry<>(endKey, startKey);
+        //noinspection SuspiciousMethodCalls
+        if(!edges.containsKey(key) && !edges.containsKey(OppositeKey)){
             throw new IllegalArgumentException("Edge with start vertex key " + key + " does not exist.");
         }
-        return edges.get(key);
+        //noinspection SuspiciousMethodCalls
+        return (edges.containsKey(key)) ? edges.get(key) : edges.get(OppositeKey);
     }
 
     public String toString() {
@@ -84,6 +89,11 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
             sb.append(edge.toString()).append("\n");
         }
         return sb.toString();
+    }
+
+    public void clear() {
+        vertices.clear();
+        edges.clear();
     }
 
 }
