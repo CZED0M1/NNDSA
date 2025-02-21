@@ -21,13 +21,14 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
         queue.add(source);
 
         while (!queue.isEmpty()) {
-            KVertex current = queue.poll();
+            KVertex current = queue.poll(); //remove first element from queue
 
             // Projdeme všechny hrany a vybereme ty, které obsahují aktuální vrchol
             for (Edge<KEdge, VEdge> edge : graph.getEdges().values()) {
                 // Obsahuje oba krajní vrcholy
                 Map.Entry<KVertex, KVertex> edgeVertexes = (Map.Entry<KVertex, KVertex>) edge.getKey();
                 // Map.entry - K,V
+
                 if (edge.isOpen()) {
                     if (edgeVertexes.getKey().equals(current) || edgeVertexes.getValue().equals(current)) {
                         // Zjištění 2.prvku hrany
@@ -37,6 +38,7 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
                         } else {
                             neighbor = edgeVertexes.getKey();
                         }
+
                         // délka trasy
                         Integer weight = (Integer) edge.getValue();
                         // délka k sousedovi
