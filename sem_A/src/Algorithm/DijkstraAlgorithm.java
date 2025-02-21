@@ -8,7 +8,7 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
     public DijkstraResult<KVertex> computeShortestPaths(Graph<KEdge, VEdge, KVertex, VVertex> graph, KVertex source) {
         Map<KVertex, Double> distances = new HashMap<>(); //Nejkratší vzdálenost k vrcholům od zdroje
         Map<KVertex, KVertex> previous = new HashMap<>(); //Výsledná cesta
-        //možná jiný seznam??
+        //TODO možná jiný seznam??
 
         // Inicializace: všem vrcholům nastavíme nekonečno a zdroji 0
         for (KVertex vertex : graph.getVertices().keySet()) {
@@ -16,7 +16,7 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
         }
         distances.put(source, 0.0);
 
-        // PriorityQueue vybírá vrchol s nejmenší známou vzdáleností
+        // PriorityQueue vybírá vrchol s nejmenší známou vzdáleností -> source
         PriorityQueue<KVertex> queue = new PriorityQueue<>(Comparator.comparingDouble(distances::get));
         queue.add(source);
 
@@ -25,13 +25,12 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
 
             // Projdeme všechny hrany a vybereme ty, které obsahují aktuální vrchol
             for (Edge<KEdge, VEdge> edge : graph.getEdges().values()) {
-                @SuppressWarnings("unchecked")
                 // Obsahuje oba krajní vrcholy
                 Map.Entry<KVertex, KVertex> edgeVertexes = (Map.Entry<KVertex, KVertex>) edge.getKey();
                 // Map.entry - K,V
                 if (edge.isOpen()) {
                     if (edgeVertexes.getKey().equals(current) || edgeVertexes.getValue().equals(current)) {
-                        // Zjištění souseda
+                        // Zjištění 2.prvku hrany
                         KVertex neighbor;
                         if (edgeVertexes.getKey().equals(current)) {
                             neighbor = edgeVertexes.getValue();
@@ -43,7 +42,6 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
                         // délka k sousedovi
                         double alt = distances.get(current) + weight;
                         if (alt < distances.get(neighbor)) {
-
                             distances.put(neighbor, alt);
                             previous.put(neighbor, current);
                             // Neaktualizovalo by to hodnotu ve frontě, takže musíme ručně odebrat a znovu přidat
@@ -56,6 +54,7 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
         }
         return new DijkstraResult<>(distances, previous);
     }
+
     public List<KVertex> getShortestPath(Map<KVertex, KVertex> previous, KVertex source, KVertex target) {
         LinkedList<KVertex> path = new LinkedList<>();
         KVertex current = target;
