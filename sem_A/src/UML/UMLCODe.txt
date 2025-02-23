@@ -1,0 +1,82 @@
+@startuml
+package Algorithm {
+    class DijkstraResult {
+        - Map<KVertex, Double> distances
+        - Map<KVertex, KVertex> previous
+        + DijkstraResult(Map<KVertex, Double> distances, Map<KVertex, KVertex> previous)
+    }
+   class DijkstraAlgorithm {
+    + DijkstraResult<KVertex> computeShortestPaths(Graph<KEdge, VEdge, KVertex, VVertex> graph, KVertex source)
+    + List<KVertex> getShortestPath(Map<KVertex, KVertex> previous, KVertex source, KVertex target)
+}
+}
+
+package DataStructures {
+    class Graph {
+        - HashMap<KVertex, Vertex<KVertex, VVertex>> vertices
+        - HashMap<KEdge, Edge<KEdge, VEdge>> edges
+        + void addVertex(Vertex<KVertex, VVertex> vertex)
+        + void addEdge(KVertex startKey, KVertex endKey, Edge<KEdge, VEdge> edge)
+        + void addEdge(KEdge key, Edge<KEdge, VEdge> edge)
+        + void removeVertex(KVertex key)
+        + void removeEdge(KVertex startKey, KVertex endKey)
+        + Vertex<KVertex, VVertex> getVertex(KVertex key)
+        + Edge<KEdge, VEdge> getEdge(KVertex startKey, KVertex endKey)
+        + String toString()
+        + void clear()
+    }
+
+    class Vertex {
+        - KVertex key
+        - VVertex value
+        + KVertex getKey()
+        + VVertex getValue()
+        + String toString()
+    }
+
+    class Edge {
+        - KEdge key
+        - VEdge value
+        - boolean open
+        + KEdge getKey()
+        + VEdge getValue()
+        + boolean isOpen()
+        + String toString()
+    }
+}
+package Implementation {
+  class CityVertex {
+    super()
+  }
+  class RoadEdge {
+    super()
+    }
+  class TransportGraph {
+    super()
+    }
+  }
+package Serialization {
+  class LoadFile {
+    + loadGraph(String fileName)
+    }
+  class SaveFile {
+    + saveGraph(Graph graph, String fileName)
+    }
+  }
+
+Edge <|.. Serializable
+Vertex <|.. Serializable
+Edge --> SaveFile
+Edge --> LoadFile 
+Vertex --> SaveFile
+Vertex --> LoadFile
+Graph "1" *-- "many" Vertex
+Graph "1" *-- "many" Edge
+DijkstraAlgorithm ..> Graph
+DijkstraAlgorithm ..> DijkstraResult
+DijkstraResult "1" *-- "many" distances
+DijkstraResult "1" *-- "many" previous
+CityVertex <|-- Vertex
+RoadEdge <|-- Edge
+TransportGraph <|-- Graph
+@enduml
