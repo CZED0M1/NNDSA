@@ -9,6 +9,8 @@ package Algorithm {
     + DijkstraResult<KVertex> computeShortestPaths(Graph<KEdge, VEdge, KVertex, VVertex> graph, KVertex source)
     + List<KVertex> getShortestPath(Map<KVertex, KVertex> previous, KVertex source, KVertex target)
 }
+    DijkstraResult *-- distances
+    DijkstraResult *-- previous
 }
 
 package DataStructures {
@@ -74,8 +76,6 @@ Graph "1" *-- "many" Vertex
 Graph "1" *-- "many" Edge
 DijkstraAlgorithm ..> Graph
 DijkstraAlgorithm ..> DijkstraResult
-DijkstraResult "1" *-- "many" distances
-DijkstraResult "1" *-- "many" previous
 CityVertex <|-- Vertex
 RoadEdge <|-- Edge
 TransportGraph <|-- Graph
