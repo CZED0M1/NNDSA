@@ -1,8 +1,7 @@
 package Algorithm;
 
 import DataStructures.Graph;
-import DataStructures.Edge;
-import DataStructures.Vertex;
+import DataStructures.Graph.Edge;
 
 import java.util.*;
 
@@ -25,10 +24,11 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
         while (!queue.isEmpty()) {
             KVertex current = queue.poll(); //remove first element from queue
 
-            Vertex<KVertex,VVertex> v = graph.getVertex(current);
+            Graph.Vertex v = graph.getVertex(current);
 
             // Projdeme všechny hrany a vybereme ty, které obsahují aktuální vrchol
-            for (Edge<KEdge, VEdge> edge : v.getEdges()) {
+            List<Edge> e = v.getEdges();
+            for (Edge edge: e) {
 
                 // Obsahuje oba krajní vrcholy
                 Map.Entry<KVertex, KVertex> edgeVertexes = (Map.Entry<KVertex, KVertex>) edge.getKey();

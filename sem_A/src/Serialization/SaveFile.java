@@ -1,8 +1,8 @@
 package Serialization;
 
-import DataStructures.Edge;
+import DataStructures.Graph.Edge;
 import DataStructures.Graph;
-import DataStructures.Vertex;
+import DataStructures.Graph.Vertex;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -13,7 +13,7 @@ public class SaveFile {
         try (FileOutputStream fileOut = new FileOutputStream(fileName);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
-            Map<?, ? extends Vertex<?,?>> vertices = graph.getVertices();
+            Map<?, ? extends Vertex> vertices = graph.getVertices();
             out.writeInt(vertices.size());
             vertices.values().forEach(vertex -> {
                 try {
@@ -23,7 +23,7 @@ public class SaveFile {
                 }
             });
 
-            Map<?, ? extends Edge<?,?>> edges = graph.getEdges();
+            Map<?, ? extends Edge> edges = graph.getEdges();
             out.writeInt(edges.size());
             edges.values().forEach(edge -> {
                 try {

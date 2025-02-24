@@ -2,11 +2,7 @@ package TextEntry;
 
 import Algorithm.DijkstraAlgorithm;
 import Algorithm.DijkstraResult;
-import DataStructures.Edge;
 import DataStructures.Graph;
-import DataStructures.Vertex;
-import Implementation.CityVertex;
-import Implementation.RoadEdge;
 import Implementation.TransportGraph;
 
 import java.util.*;
@@ -64,14 +60,14 @@ public class GraphListener {
                     System.out.println("getTable");
                     break;
                 case "addVertex":
-                    graph.addVertex(new CityVertex(parts[1], Integer.parseInt(parts[2])));
+                    graph.addVertex(graph.new CityVertex(parts[1], Integer.parseInt(parts[2])));
                     System.out.println("Vertex added.");
                     break;
                 case "addEdge":
                     String startVertex = parts[1];
                     String endVertex = parts[2];
                     int distance = Integer.parseInt(parts[3]);
-                    graph.addEdge(startVertex, endVertex, new RoadEdge(startVertex, endVertex, distance));
+                    graph.addEdge(startVertex, endVertex, graph.new RoadEdge(startVertex, endVertex, distance));
                     System.out.println("Edge added.");
                     break;
                 case "removeVertex":
@@ -83,11 +79,11 @@ public class GraphListener {
                     System.out.println("Edge removed.");
                     break;
                 case "getVertex":
-                    Vertex<String, Integer> vertex = graph.getVertex(parts[1]);
+                    Graph.Vertex vertex = graph.getVertex(parts[1]);
                     System.out.println("Vertex: " + vertex);
                     break;
                 case "getEdge":
-                    Edge<Map.Entry<String, String>, Integer> edge = graph.getEdge(parts[1], parts[2]);
+                    Graph.Edge edge = graph.getEdge(parts[1], parts[2]);
                     System.out.println("Edge: " + edge);
                     break;
                 case "clear":

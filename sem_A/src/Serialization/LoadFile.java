@@ -1,7 +1,7 @@
 package Serialization;
 
-import Implementation.CityVertex;
-import Implementation.RoadEdge;
+import Implementation.TransportGraph.CityVertex;
+import Implementation.TransportGraph.RoadEdge;
 import Implementation.TransportGraph;
 import java.io.FileInputStream;
 import java.io.IOException;

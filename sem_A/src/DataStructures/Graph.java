@@ -1,14 +1,68 @@
 package DataStructures;
 
+import lombok.Data;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.*;
 
 
 @Getter
-public abstract class Graph<KEdge, VEdge, KVertex, VVertex>{
+public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializable  {
     private final HashMap<KVertex, Vertex<KVertex, VVertex>> vertices;
     private final HashMap<KEdge, Edge<KEdge, VEdge>> edges;
+
+    @Data
+    public abstract class Vertex<K,V>  implements Serializable {
+        private K key;
+        private V value;
+        private GeoLocation location;
+        private final List<Edge> edges = new ArrayList<>();
+
+        public Vertex(K key, V value){
+            this.key = key;
+            this.value = value;
+        }
+
+        public String toString() {
+            return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")";
+        }
+
+        public void addEdge(Edge edge) {
+            if (!edges.contains(edge)) {
+                edges.add(edge);
+            }
+        }
+    }
+    @Data
+    public abstract class Edge<K, V> implements Serializable {
+        private K key;
+        private V value;
+        private boolean isOpen = true;
+
+        public Edge(K key, V value){
+            this.value = value;
+            this.key = key;
+        }
+
+
+        public boolean isOpen(){
+            return isOpen;
+        }
+
+        public void close(){
+            isOpen = false;
+        }
+
+        public void open(){
+            isOpen = true;
+        }
+
+        public String toString() {
+            return this.key + " - " + value.toString();
+        }
+    }
+
 
     public Graph(){
         vertices = new HashMap<>();
