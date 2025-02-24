@@ -34,13 +34,10 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex>{
         if(!vertices.containsKey(endKey)){
             throw new IllegalArgumentException("Vertex with key " + endKey + " does not exist.");
         }
+
         edges.put(edge.getKey(), edge);
-    }
-    public void addEdge(KEdge key, Edge<KEdge, VEdge> edge){
-        if(edges.containsKey(key)){
-            throw new IllegalArgumentException("Edge with start key " +edge.getKey()+ " already exists.");
-        }
-        edges.put(edge.getKey(), edge);
+        getVertex(startKey).addEdge(endKey);
+        getVertex(endKey).addEdge(startKey);
     }
 
     public void removeVertex(KVertex key){

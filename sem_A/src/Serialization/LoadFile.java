@@ -23,7 +23,7 @@ public class LoadFile {
             int edgeCount = in.readInt();
             for (int i = 0; i < edgeCount; i++) {
                 RoadEdge edge = (RoadEdge) in.readObject();
-                graph.addEdge(edge.getKey(), edge);
+                graph.addEdge(edge.getKey().getKey(), edge.getKey().getValue(), edge);
             }
         }
         return graph;
