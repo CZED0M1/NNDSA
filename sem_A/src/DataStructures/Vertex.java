@@ -12,7 +12,7 @@ public abstract class Vertex<K,V> implements Serializable {
     private K key;
     private V value;
     private GeoLocation location;
-    private final List<K> edges = new ArrayList<>();
+    private final List<Edge> edges = new ArrayList<>();
 
     public Vertex(K key, V value){
         this.key = key;
@@ -20,12 +20,12 @@ public abstract class Vertex<K,V> implements Serializable {
     }
 
     public String toString() {
-        return value.toString() + " - " + edges;
+        return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")";
     }
 
-    public void addEdge(K key) {
-        if (!edges.contains(key)) {
-            edges.add(key);
+    public void addEdge(Edge edge) {
+        if (!edges.contains(edge)) {
+            edges.add(edge);
         }
     }
 }

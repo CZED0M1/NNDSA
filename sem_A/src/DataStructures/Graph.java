@@ -36,8 +36,8 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex>{
         }
 
         edges.put(edge.getKey(), edge);
-        getVertex(startKey).addEdge(endKey);
-        getVertex(endKey).addEdge(startKey);
+        getVertex(startKey).addEdge(edge);
+        getVertex(endKey).addEdge(edge);
     }
 
     public void removeVertex(KVertex key){
