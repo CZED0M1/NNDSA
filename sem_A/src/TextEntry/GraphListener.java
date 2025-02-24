@@ -9,7 +9,7 @@ import java.util.*;
 
 public class GraphListener {
     private TransportGraph graph;
-    DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Object> dijkstraAlgorithm =new DijkstraAlgorithm<>();
+    DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
     DijkstraResult<String> dijkstraResult;
     public static String sourceVertex="";
 
@@ -102,8 +102,7 @@ public class GraphListener {
                     System.out.println("Graph saved.");
                     break;
                 case "setStart":
-                    //noinspection rawtypes
-                    dijkstraResult = dijkstraAlgorithm.computeShortestPaths((Graph) graph, parts[1]);
+                    dijkstraResult = dijkstraAlgorithm.computeShortestPaths(graph, parts[1]);
                     sourceVertex=parts[1];
                     break;
                 case "getShortestPath":
