@@ -29,6 +29,6 @@ public abstract class Edge<K, V> implements Serializable {
     }
 
     public String toString() {
-        return value.toString();
+        return this.key + " - " + value.toString();
     }
 }
