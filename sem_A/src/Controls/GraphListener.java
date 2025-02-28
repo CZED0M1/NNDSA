@@ -1,4 +1,4 @@
-package TextEntry;
+package Controls;
 
 import Algorithm.DijkstraAlgorithm;
 import Algorithm.DijkstraResult;
