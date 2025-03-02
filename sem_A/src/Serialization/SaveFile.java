@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-public class SaveFile {
+public class SaveFile  {
     public static void saveGraph(Graph<?, ?, ?, ?> graph, String fileName) throws IOException {
         try (FileOutputStream fileOut = new FileOutputStream(fileName);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {

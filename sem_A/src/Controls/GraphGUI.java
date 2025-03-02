@@ -9,7 +9,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ public class GraphGUI extends JFrame {
     private JTextArea outputArea;
     DijkstraResult<String> dijkstraResult;
     String sourceVector;
-    JTable jTable = new JTable();
 
     DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
 

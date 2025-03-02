@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>C:/Users/domin/OneDrive/Desktop/Programming + school/UPCE/Ing/2/NNDSA/NNDSA_A/sem_A/src</OriginalElement>
+  <nodes>
+    <node x="-1898.0" y="2639.5">Implementation.TransportGraph.RoadEdge</node>
+    <node x="-1375.5" y="2359.5">Implementation.TransportGraph</node>
+    <node x="-1639.0" y="1487.0">Serialization.SaveFile</node>
+    <node x="-1591.0" y="1814.0">DataStructures.Graph</node>
+    <node x="-2257.0" y="2727.0">Controls.GraphGUI</node>
+    <node x="-2279.0" y="1487.0">Serialization.LoadFile</node>
+    <node x="-2127.5" y="1195.0">Algorithm.DijkstraAlgorithm</node>
+    <node x="-1297.0" y="2639.5">Implementation.TransportGraph.CityVertex</node>
+    <node x="-1275.5" y="1342.0">DataStructures.Graph.Vertex</node>
+    <node x="-1726.5" y="2955.0">Controls.GraphListener</node>
+    <node x="-1472.5" y="774.0">DataStructures.Graph.Edge</node>
+    <node x="-1305.5" y="482.0">DataStructures.GeoLocation</node>
+    <node x="-2095.5" y="2262.0">Algorithm.DijkstraResult</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Controls.GraphGUI" target="Algorithm.DijkstraAlgorithm" relationship="TO_ONE">
+      <point x="169.0" y="-83.5" />
+      <point x="-1614.0" y="2927.5" />
+      <point x="-1614.0" y="2244.5" />
+      <point x="-1828.0" y="2244.5" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="Implementation.TransportGraph.CityVertex" target="Implementation.TransportGraph" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="-1188.0" y="2580.0" />
+      <point x="-1288.0" y="2580.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="Implementation.TransportGraph.RoadEdge" target="DataStructures.Graph.Edge" relationship="GENERALIZATION">
+      <point x="-130.0" y="0.0" />
+      <point x="-2296.5" y="2671.0" />
+      <point x="-2296.5" y="1397.0" />
+      <point x="-1368.0" y="1397.0" />
+      <point x="0.0" y="177.0" />
+    </edge>
+    <edge source="Implementation.TransportGraph.CityVertex" target="DataStructures.Graph.Vertex" relationship="GENERALIZATION">
+      <point x="50.0" y="-31.5" />
+      <point x="30.0" y="189.0" />
+    </edge>
+    <edge source="Implementation.TransportGraph" target="DataStructures.Graph" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="100.0" y="177.0" />
+    </edge>
+    <edge source="Controls.GraphGUI" target="Implementation.TransportGraph" relationship="TO_ONE">
+      <point x="169.0" y="73.5" />
+      <point x="-1432.0" y="3084.5" />
+      <point x="-1432.0" y="2391.0" />
+      <point x="-87.5" y="0.0" />
+    </edge>
+    <edge source="Serialization.SaveFile" target="DataStructures.Graph.Edge" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="-1508.0" y="1397.0" />
+      <point x="-1368.0" y="1397.0" />
+      <point x="0.0" y="177.0" />
+    </edge>
+    <edge source="DataStructures.Graph.Vertex" target="DataStructures.Graph.Edge" relationship="TO_MANY">
+      <point x="-107.5" y="0.0" />
+      <point x="-1303.0" y="1531.0" />
+      <point x="-1303.0" y="1324.5" />
+      <point x="-1268.0" y="1324.5" />
+      <point x="100.0" y="177.0" />
+    </edge>
+    <edge source="Controls.GraphListener" target="Algorithm.DijkstraAlgorithm" relationship="TO_ONE">
+      <point x="24.5" y="-56.0" />
+      <point x="-1583.5" y="2265.0" />
+      <point x="-1614.0" y="2265.0" />
+      <point x="-1614.0" y="2244.5" />
+      <point x="-1828.0" y="2244.5" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="Controls.GraphListener" target="Algorithm.DijkstraResult" relationship="TO_ONE">
+      <point x="-118.5" y="0.0" />
+      <point x="-1822.0" y="3011.0" />
+      <point x="-1822.0" y="3312.5" />
+      <point x="-2311.5" y="3312.5" />
+      <point x="-2311.5" y="2391.0" />
+      <point x="-227.5" y="0.0" />
+    </edge>
+    <edge source="DataStructures.Graph.Edge" target="DataStructures.Graph" relationship="INNER_CLASS">
+      <point x="42.0" y="177.0" />
+      <point x="-1326.0" y="1767.0" />
+      <point x="-1388.0" y="1767.0" />
+      <point x="0.0" y="-177.0" />
+    </edge>
+    <edge source="DataStructures.Graph" target="DataStructures.Graph.Vertex" relationship="TO_MANY">
+      <point x="203.0" y="0.0" />
+      <point x="-1153.0" y="1991.0" />
+      <point x="15.0" y="189.0" />
+    </edge>
+    <edge source="DataStructures.Graph" target="Algorithm.DijkstraAlgorithm" relationship="GENERALIZATION">
+      <point x="-203.0" y="0.0" />
+      <point x="-1813.0" y="1991.0" />
+      <point x="15.0" y="56.0" />
+    </edge>
+    <edge source="Serialization.LoadFile" target="DataStructures.Graph.Edge" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="-2148.0" y="1397.0" />
+      <point x="-1368.0" y="1397.0" />
+      <point x="0.0" y="177.0" />
+    </edge>
+    <edge source="DataStructures.Graph.Vertex" target="DataStructures.GeoLocation" relationship="TO_ONE">
+      <point x="-20.0" y="-189.0" />
+      <point x="0.0" y="129.0" />
+    </edge>
+    <edge source="Controls.GraphListener" target="Implementation.TransportGraph" relationship="TO_ONE">
+      <point x="118.5" y="0.0" />
+      <point x="-1432.0" y="3011.0" />
+      <point x="-1432.0" y="2391.0" />
+      <point x="-87.5" y="0.0" />
+    </edge>
+    <edge source="Controls.GraphGUI" target="Algorithm.DijkstraResult" relationship="TO_ONE">
+      <point x="169.0" y="0.0" />
+      <point x="-1822.0" y="3011.0" />
+      <point x="-1822.0" y="3312.5" />
+      <point x="-2311.5" y="3312.5" />
+      <point x="-2311.5" y="2391.0" />
+      <point x="-227.5" y="0.0" />
+    </edge>
+    <edge source="DataStructures.Graph.Vertex" target="DataStructures.Graph" relationship="INNER_CLASS">
+      <point x="0.0" y="189.0" />
+      <point x="-1168.0" y="1767.0" />
+      <point x="-1388.0" y="1767.0" />
+      <point x="0.0" y="-177.0" />
+    </edge>
+    <edge source="Implementation.TransportGraph.RoadEdge" target="Implementation.TransportGraph" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="-1768.0" y="2580.0" />
+      <point x="-1288.0" y="2580.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="DataStructures.Graph" target="DataStructures.Graph.Edge" relationship="TO_MANY">
+      <point x="62.0" y="-177.0" />
+      <point x="-1326.0" y="1782.0" />
+      <point x="-1303.0" y="1782.0" />
+      <point x="-1303.0" y="1324.5" />
+      <point x="-1268.0" y="1324.5" />
+      <point x="100.0" y="177.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Compact" zoom="0.31252192213258506" showDependencies="true" x="-1675.999999999999" y="1907.5000000000002" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
