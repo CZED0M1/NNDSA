@@ -14,67 +14,84 @@ import java.util.Map;
 
 public class GraphGUI extends JFrame {
     private TransportGraph graph;
-    private JTextArea outputArea;
+    private final JTextArea outputArea;
     DijkstraResult<String> dijkstraResult;
     String sourceVector;
+    private final JPanel dijkstraPanel = new JPanel();
 
     DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
 
     public GraphGUI() {
-        graph = new TransportGraph(); // Tvůj graf
+        graph = new TransportGraph();
         setTitle("Graph GUI");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Výstupní oblast
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         add(new JScrollPane(outputArea), BorderLayout.CENTER);
 
-        // Panel s tlačítky
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(0, 2));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        // Přidání tlačítek
-        addButton(buttonPanel, "Přidat vrchol", _ -> addVertex());
-        addButton(buttonPanel, "Přidat hranu", _ -> addEdge());
-        addButton(buttonPanel, "Odstranit vrchol", _ -> removeVertex());
-        addButton(buttonPanel, "Odstranit hranu", _ -> removeEdge());
-        addButton(buttonPanel, "Najít vrchol", _ -> getVertex());
-        addButton(buttonPanel, "Najít hranu", _ -> getEdge());
-        addButton(buttonPanel, "Vymazat graf", _ -> clearGraph());
-        addButton(buttonPanel, "Vypsat graf", _ -> printGraph());
-        addButton(buttonPanel, "Načíst soubor", _ -> {
+        JPanel vertexEdgePanel = new JPanel();
+        vertexEdgePanel.setLayout(new GridLayout(0, 1));
+        vertexEdgePanel.setBorder(BorderFactory.createTitledBorder("Vertices and Edges"));
+        addButton(vertexEdgePanel, "Add Vertex", _ -> addVertex(),true);
+        addButton(vertexEdgePanel, "Add Edge", _ -> addEdge(),true);
+        addButton(vertexEdgePanel, "Remove Vertex", _ -> removeVertex(),true);
+        addButton(vertexEdgePanel, "Remove Edge", _ -> removeEdge(),true);
+        addButton(vertexEdgePanel, "Find Vertex", _ -> getVertex(),true);
+        addButton(vertexEdgePanel, "Find Edge", _ -> getEdge(),true);
+        mainPanel.add(vertexEdgePanel);
+
+        JPanel graphPanel = new JPanel();
+        graphPanel.setLayout(new GridLayout(0, 1));
+        graphPanel.setBorder(BorderFactory.createTitledBorder("Graph"));
+        addButton(graphPanel, "Clear Graph", _ -> clearGraph(),true);
+        addButton(graphPanel, "Print Graph", _ -> printGraph(),true);
+        mainPanel.add(graphPanel);
+
+        JPanel serializationPanel = new JPanel();
+        serializationPanel.setLayout(new GridLayout(0, 1));
+        serializationPanel.setBorder(BorderFactory.createTitledBorder("Serialization"));
+        addButton(serializationPanel, "Load File", _ -> {
             try {
                 loadGraph();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
-        });
-        addButton(buttonPanel, "Uložit soubor", _ -> {
+        },true);
+        addButton(serializationPanel, "Save File", _ -> {
             try {
                 saveGraph();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-        });
-        addButton(buttonPanel, "Nastavit start", _ -> setStartVertex());
-        addButton(buttonPanel, "Nejkratší cesta", _ -> getShortestPath());
-        addButton(buttonPanel, "Vytisknout cestu", _ -> printPath());
-        addButton(buttonPanel, "Zavřít hranu", _ -> closeEdge());
-        addButton(buttonPanel, "Otevřít hranu", _ -> openEdge());
-        addButton(buttonPanel, "Je hrana otevřená?", _ -> isEdgeOpen());
-        addButton(buttonPanel, "Získat matici následníků", _ -> showBigTable());
-        addButton(buttonPanel, "Získat tabulku následníků", _ -> showSmallTable());
+        },true);
+        mainPanel.add(serializationPanel);
 
-        add(buttonPanel, BorderLayout.EAST);
+        dijkstraPanel.setLayout(new GridLayout(0, 1));
+        dijkstraPanel.setBorder(BorderFactory.createTitledBorder("Dijkstra"));
+        addButton(dijkstraPanel, "Set Start", _ -> setStartVertex(),true);
+        addButton(dijkstraPanel, "Shortest Path", _ -> getShortestPath(),false);
+        addButton(dijkstraPanel, "Print Path", _ -> printPath(),false);
+        addButton(dijkstraPanel, "Close Edge", _ -> closeEdge(),true);
+        addButton(dijkstraPanel, "Open Edge", _ -> openEdge(),true);
+        addButton(dijkstraPanel, "Is Edge Open?", _ -> isEdgeOpen(),true);
+        addButton(dijkstraPanel, "Get Successor Matrix", _ -> showBigTable(),false);
+        addButton(dijkstraPanel, "Get Successor Table", _ -> showSmallTable(),false);
+        mainPanel.add(dijkstraPanel);
+
+        add(mainPanel, BorderLayout.EAST);
     }
 
-    private void addButton(JPanel panel, String text, ActionListener action) {
+    private void addButton(JPanel panel, String text, ActionListener action, boolean enabled) {
         JButton button = new JButton(text);
         button.addActionListener(action);
         panel.add(button);
+        button.setEnabled(enabled);
     }
 
     private void addVertex() {
@@ -144,7 +161,6 @@ public class GraphGUI extends JFrame {
     private void saveGraph() throws IOException {
         String filename = JOptionPane.showInputDialog("Zadejte název souboru:");
         Serialization.SaveFile.saveGraph(graph,filename);
-        // Implementace ukládání
         outputArea.append("Graf uložen do souboru: " + filename + "\n");
     }
 
@@ -152,14 +168,17 @@ public class GraphGUI extends JFrame {
         String name = JOptionPane.showInputDialog("Zadejte název startovního vrcholu:");
         dijkstraResult = dijkstraAlgorithm.computeShortestPaths(graph, name);
         sourceVector=name;
-        // Implementace
+        Component[] components = dijkstraPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JButton button) {
+                button.setEnabled(true);
+            }
+        }
         outputArea.append("Startovní vrchol nastaven: " + name + "\n");
     }
 
     private void getShortestPath() {
         String target = JOptionPane.showInputDialog("Zadejte cílový vrchol:");
-        // Implementace Dijkstrova algoritmu
-
         Double path = dijkstraResult.getDistances().get(target);
         outputArea.append("Nejkratší cesta k " + target + " je " + path + " \n");
     }
@@ -168,8 +187,6 @@ public class GraphGUI extends JFrame {
         String start = JOptionPane.showInputDialog("Zadejte startovní vrchol:");
         String end = JOptionPane.showInputDialog("Zadejte koncový vrchol:");
         List<String> path = dijkstraAlgorithm.getShortestPath(dijkstraResult.getPrevious(), start, end);
-
-        // Implementace
         outputArea.append("Cesta z " + start + " do " + end + ": "+ path + "\n");
     }
 
@@ -190,7 +207,6 @@ public class GraphGUI extends JFrame {
     private void isEdgeOpen() {
         String start = JOptionPane.showInputDialog("Zadejte počáteční vrchol:");
         String end = JOptionPane.showInputDialog("Zadejte koncový vrchol:");
-        // Implementace
         outputArea.append("Hrana " + start + " - " + end + " je otevřená: "+ graph.getEdge(start, end).isOpen() +"\n");
     }
 
@@ -198,24 +214,21 @@ public class GraphGUI extends JFrame {
         JFrame tableWindow = new JFrame("Tabulka následníků");
         tableWindow.setSize(600, 400);
         tableWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        // Získáme seznam vrcholů
+        //Seznam vrcholů
         String[] vertices = graph.getVertices().keySet().toArray(new String[0]);
-
         int size = vertices.length;
 
-        // Vytvoříme tabulku (prázdná matice)
+        // Vytvoříme tabulku
         Object[][] tableData = new Object[1][size+1];
 
-        // První řádek - názvy sloupců
         String[] columnNames = new String[size + 1];
-        columnNames[0] = "";  // Prázdná první buňka
-        System.arraycopy(vertices, 0, columnNames, 1, size); // Kopírování názvů uzlů
+        columnNames[0] = "";
+        System.arraycopy(vertices, 0, columnNames, 1, size);
 
 
         // Naplnění tabulky
         for (int i = 0; i < columnNames.length; i++) {
-                String to = columnNames[i]; // Cílový uzel
+                String to = columnNames[i];
                     tableData[0][i] = dijkstraResult.getPrevious().get(to);
         }
         tableData[0][0]=sourceVector;
@@ -255,7 +268,7 @@ public class GraphGUI extends JFrame {
             for (int j = 1; j <= size; j++) {
                 String to = columnNames[j]; // Cílový uzel
 
-                // Pokud hledáme cestu z "from" do "to"
+                // Pokud hledáme cestu z from -> to
                 if (!from.equals(to)) {
                     tableData[i][j] = getFirstStep(from, to);
                 } else {
