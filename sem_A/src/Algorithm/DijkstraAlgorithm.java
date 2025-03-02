@@ -24,7 +24,6 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
             KVertex current = queue.poll(); //remove first element from queue
 
             Graph.Vertex vertex = graph.getVertex(current);
-            //TODO předělat abych neměl vertex a edge
 
             // Projdeme všechny hrany a vybereme ty, které obsahují aktuální vrchol
             List<Edge> edges = vertex.getEdges();
