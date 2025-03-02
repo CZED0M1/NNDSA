@@ -79,11 +79,11 @@ public class GraphListener {
                     System.out.println("Edge removed.");
                     break;
                 case "getVertex":
-                    Graph.Vertex vertex = graph.getVertex(parts[1]);
+                    Graph<Map.Entry<String, String>, Integer, String, Integer>.Vertex<String, Integer> vertex = graph.getVertex(parts[1]);
                     System.out.println("Vertex: " + vertex);
                     break;
                 case "getEdge":
-                    Graph.Edge edge = graph.getEdge(parts[1], parts[2]);
+                    Graph<Map.Entry<String, String>, Integer, String, Integer>.Edge<Map.Entry<String, String>, Integer> edge = graph.getEdge(parts[1], parts[2]);
                     System.out.println("Edge: " + edge);
                     break;
                 case "clear":

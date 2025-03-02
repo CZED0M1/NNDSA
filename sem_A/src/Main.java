@@ -1,8 +1,9 @@
-import Controls.GraphListener;
+import Controls.GraphGUI;
+
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        GraphListener listener = new GraphListener();
-        listener.startListening();
+        SwingUtilities.invokeLater(() -> new GraphGUI().setVisible(true));
     }
 }

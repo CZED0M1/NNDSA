@@ -17,7 +17,7 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
         private K key;
         private V value;
         private GeoLocation location;
-        private final List<Edge> edges = new ArrayList<>();
+        private final List<Edge<?,?>> edges = new ArrayList<>();
 
         public Vertex(K key, V value){
             this.key = key;
@@ -28,7 +28,7 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializa
             return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")";
         }
 
-        public void addEdge(Edge edge) {
+        public void addEdge(Edge<?,?> edge) {
             if (!edges.contains(edge)) {
                 edges.add(edge);
             }
