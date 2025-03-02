@@ -1,5 +1,6 @@
 package DataStructures;
 
+import Algorithm.DijkstraAlgorithm;
 import lombok.Data;
 import lombok.Getter;
 
@@ -8,7 +9,7 @@ import java.util.*;
 
 
 @Getter
-public abstract class Graph<KEdge, VEdge, KVertex, VVertex> implements Serializable  {
+public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgorithm implements Serializable  {
     private final HashMap<KVertex, Vertex<KVertex, VVertex>> vertices;
     private final HashMap<KEdge, Edge<KEdge, VEdge>> edges;
 

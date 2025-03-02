@@ -9,7 +9,6 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
     public DijkstraResult<KVertex> computeShortestPaths(Graph<KEdge, VEdge, KVertex, VVertex> graph, KVertex source) {
         Map<KVertex, Double> distances = new HashMap<>(); //Nejkratší vzdálenost k vrcholům od zdroje
         Map<KVertex, KVertex> previous = new HashMap<>(); //Výsledná cesta
-        //TODO možná jiný seznam??
 
         // Inicializace: všem vrcholům nastavíme nekonečno a zdroji 0
         for (KVertex vertex : graph.getVertices().keySet()) {
@@ -24,11 +23,12 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
         while (!queue.isEmpty()) {
             KVertex current = queue.poll(); //remove first element from queue
 
-            Graph.Vertex v = graph.getVertex(current);
+            Graph.Vertex vertex = graph.getVertex(current);
+            //TODO předělat abych neměl vertex a edge
 
             // Projdeme všechny hrany a vybereme ty, které obsahují aktuální vrchol
-            List<Edge> e = v.getEdges();
-            for (Edge edge: e) {
+            List<Edge> edges = vertex.getEdges();
+            for (Edge edge: edges) {
 
                 // Obsahuje oba krajní vrcholy
                 Map.Entry<KVertex, KVertex> edgeVertexes = (Map.Entry<KVertex, KVertex>) edge.getKey();
@@ -48,10 +48,11 @@ public class DijkstraAlgorithm<KEdge, VEdge, KVertex, VVertex> {
                         Integer weight = (Integer) edge.getValue();
                         // délka k sousedovi
                         double alt = distances.get(current) + weight;
+
                         if (alt < distances.get(neighbor)) {
-                            distances.put(neighbor, alt);
-                            previous.put(neighbor, current);
-                            // Neaktualizovalo by to hodnotu ve frontě, takže musíme ručně odebrat a znovu přidat
+                            distances.put(neighbor, alt); //add or replace
+                            previous.put(neighbor, current); //add or replace
+                            // Pokud už obsahuje, tak odebereme a přidáme znovu
                             queue.remove(neighbor);
                             queue.add(neighbor);
                         }

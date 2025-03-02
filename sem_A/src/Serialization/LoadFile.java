@@ -1,5 +1,6 @@
 package Serialization;
 
+import DataStructures.Graph;
 import Implementation.TransportGraph.CityVertex;
 import Implementation.TransportGraph.RoadEdge;
 import Implementation.TransportGraph;
