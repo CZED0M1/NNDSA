@@ -9,8 +9,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 
 public class GraphGUI extends JFrame {
     private TransportGraph graph;
@@ -85,6 +85,7 @@ public class GraphGUI extends JFrame {
         mainPanel.add(dijkstraPanel);
 
         add(mainPanel, BorderLayout.EAST);
+
     }
 
     private void addButton(JPanel panel, String text, ActionListener action, boolean enabled) {

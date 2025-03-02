@@ -94,7 +94,7 @@ public class GraphListener {
                     System.out.println(graph);
                     break;
                 case "load":
-                    graph = Serialization.LoadFile.loadGraph("graph.ser");
+                    graph = Serialization.LoadFile.loadGraph("zadani.ser");
                     System.out.println("Graph loaded.");
                     break;
                 case "save":
