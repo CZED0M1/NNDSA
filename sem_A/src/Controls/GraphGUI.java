@@ -2,6 +2,7 @@ package Controls;
 
 import Algorithm.DijkstraAlgorithm;
 import Algorithm.DijkstraResult;
+import Grid.GridIndex;
 import Implementation.TransportGraph;
 
 import javax.swing.*;
@@ -18,13 +19,14 @@ public class GraphGUI extends JFrame {
     DijkstraResult<String> dijkstraResult;
     String sourceVector;
     private final JPanel dijkstraPanel = new JPanel();
+    private GridIndex gridIndex;
 
     DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
 
     public GraphGUI() {
         graph = new TransportGraph();
         setTitle("Graph GUI");
-        setSize(800, 600);
+        setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -84,8 +86,30 @@ public class GraphGUI extends JFrame {
         addButton(dijkstraPanel, "Get Successor Table", _ -> showSmallTable(),false);
         mainPanel.add(dijkstraPanel);
 
+        JPanel gridPanel = new JPanel();
+        gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
+        addButton(gridPanel, "Create Grid", _ -> createGrid(),true);
+        addButton(gridPanel, "Print Grid", _ -> printGrid(),true);
+        mainPanel.add(gridPanel);
+
         add(mainPanel, BorderLayout.EAST);
 
+    }
+
+    private void printGrid() {
+        List<List<String>> verticesKeys = gridIndex.getVerticesKeys();
+        for (int i = 0; i < verticesKeys.size(); i++) {
+            for (int j = 0; j < verticesKeys.get(i).size(); j++) {
+                System.out.print(verticesKeys.get(i).get(j));
+            }
+            System.out.println();
+        }
+
+    }
+
+    private void createGrid() {
+        gridIndex = new GridIndex(graph);
+        outputArea.append("Grid byl vytvořen.\n");
     }
 
     private void addButton(JPanel panel, String text, ActionListener action, boolean enabled) {

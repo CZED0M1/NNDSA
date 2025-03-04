@@ -77,6 +77,10 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
         vertices.put(vertex.getKey(), vertex);
     }
 
+    public GeoLocation getLocation(KVertex vertexKey){
+        return getVertex(vertexKey).getLocation();
+    }
+
     public void addEdge(KVertex startKey, KVertex endKey, Edge<KEdge, VEdge> edge){
         Map.Entry<KVertex,KVertex> key = new AbstractMap.SimpleEntry<>(startKey, endKey);
         //noinspection SuspiciousMethodCalls
@@ -128,6 +132,10 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
         }
         //noinspection SuspiciousMethodCalls
         return (edges.containsKey(key)) ? edges.get(key) : edges.get(OppositeKey);
+    }
+
+    public List<KVertex> getVerticesKeys() {
+        return new ArrayList<>(vertices.keySet());
     }
 
     public String toString() {
