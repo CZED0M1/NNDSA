@@ -20,13 +20,14 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
         private GeoLocation location;
         private final List<Edge<?,?>> edges = new ArrayList<>();
 
-        public Vertex(K key, V value){
+        public Vertex(K key, V value, double latitude, double longitude){
             this.key = key;
             this.value = value;
+            this.location = new GeoLocation(latitude, longitude);
         }
 
         public String toString() {
-            return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")";
+            return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")" + location;
         }
 
         public void addEdge(Edge<?,?> edge) {

@@ -15,6 +15,7 @@ public class GridIndex<K> {
     private List<Double> horizontal;
     private Graph graph;
 
+
     public GridIndex(Graph graph) {
         this.graph = graph;
         this.vertical = new ArrayList<>();

@@ -122,9 +122,13 @@ public class GraphGUI extends JFrame {
     private void addVertex() {
         String name = JOptionPane.showInputDialog("Zadejte název vrcholu:");
         String popStr = JOptionPane.showInputDialog("Zadejte populaci:");
+        String latitudeStr = JOptionPane.showInputDialog("Zadejte latitude:");
+        String longitudeStr = JOptionPane.showInputDialog("Zadejte longitude:");
         try {
             int population = Integer.parseInt(popStr);
-            graph.addVertex(graph.new CityVertex(name, population));
+            double latitude = Double.parseDouble(latitudeStr);
+            double longitude = Double.parseDouble(longitudeStr);
+            graph.addVertex(graph.new CityVertex(name, population, latitude, longitude));
             outputArea.append("Přidán vrchol: " + name + "\n");
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
