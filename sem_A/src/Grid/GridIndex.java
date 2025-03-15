@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 @Data
-public class GridIndex<K> {
-    private List<List<K>> verticesKeys;
+public class GridIndex<KVertex> {
+    private List<List<KVertex>> verticesKeys;
     private List<Double> vertical;
     private List<Double> horizontal;
     private Graph graph;
@@ -26,59 +26,97 @@ public class GridIndex<K> {
 
     private void createGrid() {
         //Naplnění seznamů hodnotami z grafu
-        List<K> vertices = graph.getVerticesKeys();
+        List<KVertex> vertices = graph.getVerticesKeys();
         PriorityQueue<Double> sortedLatitude = new PriorityQueue<>();
         PriorityQueue<Double> sortedLongitude = new PriorityQueue<>();
-        for (K vertex : vertices) {
+        for (KVertex vertex : vertices) {
             double latitude = graph.getLocation(vertex).getLatitude();
             double longitude = graph.getLocation(vertex).getLongitude();
             sortedLatitude.add(latitude);
             sortedLongitude.add(longitude);
         }
 
-        int size = vertices.size();
+        vertical.add(0.0);
+        horizontal.add(0.0);
 
-        for (int i = 0; i < size; i++) {
-            if(i % 2 == 0) {
+        for (int i = 0; i < vertices.size(); i++) {
+            if (i % 2 == 0) {
                 //Vertical
-                decomposeGrid(sortedLatitude, vertical, sortedLatitude.poll());
+                decomposeGrid(sortedLatitude,sortedLongitude, vertical);
             } else {
                 //Horizontal
-                decomposeGrid(sortedLongitude, horizontal, sortedLatitude.poll());
+                decomposeGrid(sortedLongitude,sortedLatitude, horizontal);
             }
         }
-        fillGrid(size);
+        fillGrid();
     }
 
-    private void fillGrid(int size) {
-        //TODO
-        for (int i = 0; i < size; i++) {
-            List<K> row = new ArrayList<>();
-            for (int j = 0; j < size; j++) {
-                //TODO podle rozdělení vertical + horizontal
+    private void fillGrid() {
+        ALL_VERTICES:
+        for (Object key : graph.getVerticesKeys()) {
+            for (int i = 0; i < vertical.size(); i++) {
+                verticesKeys.add(new ArrayList<>());
+                if (graph.getLocation(key).getLatitude() < vertical.get(i)) {
+                    for (int j = 0; j < horizontal.size(); j++) {
+                        if (graph.getLocation(key).getLongitude() < horizontal.get(j)) {
+                            while (verticesKeys.get(i - 1).size() < j - 1) {
+                                verticesKeys.get(i - 1).add(null);
+                            }
+                            verticesKeys.get(i - 1).add(j - 1, (KVertex) key);
+                            continue ALL_VERTICES;
+                        }
+                    }
+                }
             }
-            verticesKeys.add(row);
         }
     }
 
-    private void decomposeGrid(PriorityQueue<Double> sortedLatitude, List<Double> vertical, Double poll) {
-        if(sortedLatitude.size() == 1) {
-            vertical.add(poll);
+    private void decomposeGrid(PriorityQueue<Double> sortedList,PriorityQueue<Double> secondSortedList, List<Double> splitList) {
+        if (sortedList.isEmpty()) { return;}
+        if (sortedList.size() == 1) {
+            splitList.add(sortedList.poll());
             return;
         }
         @SuppressWarnings("ConstantConditions")
-        double a = sortedLatitude.poll();
+        double a = sortedList.poll();
+        secondSortedList.poll();
         @SuppressWarnings("ConstantConditions")
-        double b = sortedLatitude.poll();
-        double result = ((a+b)/2);
-        vertical.add(result);
+        double b = sortedList.poll();
+        secondSortedList.poll();
+        //TODO zjistit možnost více vertexů v jedné bunce
+        if (!findRange(new GeoLocation(a,b), new GeoLocation(horizontal.getLast(), vertical.getLast())).isEmpty())
+        {
+            double result = ((a + b) / 2);
+            splitList.add(result);
+        }
+
     }
 
-    private int findRange(GeoLocation start, GeoLocation end) {
-        return 0;
-    }
-    private int findPoint(GeoLocation location) {
-        return 0;
+    public List<KVertex> findRange(GeoLocation start, GeoLocation end) {
+        List<KVertex> outputList = new ArrayList<>();
+        ALL_VERTICES:
+        for (Object key : graph.getVerticesKeys()) {
+            for (int i = 0; i < vertical.size(); i++) {
+                if (graph.getLocation(key).getLatitude() >= start.getLatitude() &&
+                    graph.getLocation(key).getLatitude() <= end.getLatitude()) {
+                    for (int j = 0; j < horizontal.size(); j++) {
+                        if (graph.getLocation(key).getLongitude() >= start.getLongitude() &&
+                            graph.getLocation(key).getLongitude() <= end.getLongitude()) {
+                                outputList.add((KVertex) key);
+                                continue ALL_VERTICES;
+                        }
+                    }
+                }
+            }
+        }
+        return outputList;
     }
 
+    public KVertex findPoint(GeoLocation location) {
+        if (findRange(location,location).size()>1) {
+            System.out.println(findRange(location,location).size());
+
+        }
+      return findRange(location,location).getFirst();
+    }
 }

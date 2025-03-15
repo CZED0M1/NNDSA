@@ -2,8 +2,10 @@ package DataStructures;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class GeoLocation {
+public class GeoLocation implements Serializable {
     private double latitude;
     private double longitude;
 
