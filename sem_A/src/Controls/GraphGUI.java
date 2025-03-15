@@ -135,7 +135,7 @@ public class GraphGUI extends JFrame {
     }
 
     private void printGrid() {
-        List<List<String>> gridIndexList = gridIndex.getVerticesKeys();
+        List<List<String>> gridIndexList = gridIndex.getGrid();
         for (int i = 0; i < gridIndexList.size(); i++) {
             for (int j = 0; j < gridIndexList.get(i).size(); j++) {
                 System.out.print(gridIndexList.get(i).get(j) + " ");
@@ -321,7 +321,7 @@ public class GraphGUI extends JFrame {
 
                 List<Double> horizontal = gridIndex.getHorizontal();
                 List<Double> vertical = gridIndex.getVertical();
-                List<List> verticesKeys = gridIndex.getVerticesKeys();
+                List<List> verticesKeys = gridIndex.getGrid();
 
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -382,8 +382,8 @@ public class GraphGUI extends JFrame {
                             double latitude = graph.getLocation(key).getLatitude();
                             double longitude = graph.getLocation(key).getLongitude();
 
-                            int y = (int) ((longitude - minX) * xScale) + padding;
-                            int x = (int) ((latitude - minY) * yScale) + padding;
+                            int x = (int) ((longitude - minX) * xScale) + padding;
+                            int y = (int) ((latitude - minY) * yScale) + padding;
 
                             // Nakreslení bodu
                             g2.fillOval(x - 3, y - 3, 6, 6);

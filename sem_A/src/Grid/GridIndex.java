@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
 
 @Data
 public class GridIndex<KVertex> {
-    private List<List<KVertex>> verticesKeys;
+    private List<List<KVertex>> grid;
     private List<Double> vertical;
     private List<Double> horizontal;
     private Graph graph;
@@ -20,12 +20,11 @@ public class GridIndex<KVertex> {
         this.graph = graph;
         this.vertical = new ArrayList<>();
         this.horizontal = new ArrayList<>();
-        this.verticesKeys = new ArrayList<>();
+        this.grid = new ArrayList<>();
         createGrid();
     }
 
     private void createGrid() {
-        //Naplnění seznamů hodnotami z grafu
         List<KVertex> vertices = graph.getVerticesKeys();
         PriorityQueue<Double> sortedLatitude = new PriorityQueue<>();
         PriorityQueue<Double> sortedLongitude = new PriorityQueue<>();
@@ -55,14 +54,14 @@ public class GridIndex<KVertex> {
         ALL_VERTICES:
         for (Object key : graph.getVerticesKeys()) {
             for (int i = 0; i < vertical.size(); i++) {
-                verticesKeys.add(new ArrayList<>());
+                grid.add(new ArrayList<>());
                 if (graph.getLocation(key).getLatitude() < vertical.get(i)) {
                     for (int j = 0; j < horizontal.size(); j++) {
                         if (graph.getLocation(key).getLongitude() < horizontal.get(j)) {
-                            while (verticesKeys.get(i - 1).size() < j - 1) {
-                                verticesKeys.get(i - 1).add(null);
+                            while (grid.get(i - 1).size() < j - 1) {
+                                grid.get(i - 1).add(null);
                             }
-                            verticesKeys.get(i - 1).add(j - 1, (KVertex) key);
+                            grid.get(i - 1).add(j - 1, (KVertex) key);
                             continue ALL_VERTICES;
                         }
                     }
@@ -84,11 +83,9 @@ public class GridIndex<KVertex> {
         double b = sortedList.poll();
         secondSortedList.poll();
         //TODO zjistit možnost více vertexů v jedné bunce
-        if (!findRange(new GeoLocation(a,b), new GeoLocation(horizontal.getLast(), vertical.getLast())).isEmpty())
-        {
             double result = ((a + b) / 2);
             splitList.add(result);
-        }
+
 
     }
 
