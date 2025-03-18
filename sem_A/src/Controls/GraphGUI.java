@@ -26,6 +26,7 @@ public class GraphGUI extends JFrame {
 
     public GraphGUI() {
         graph = new TransportGraph();
+        gridIndex = new GridIndex();
         setTitle("Graph GUI");
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -146,7 +147,7 @@ public class GraphGUI extends JFrame {
     }
 
     private void createGrid() {
-        gridIndex = new GridIndex(graph);
+        gridIndex.createGrid();
         outputArea.append("Grid byl vytvořen.\n");
     }
 
@@ -167,6 +168,7 @@ public class GraphGUI extends JFrame {
             double latitude = Double.parseDouble(latitudeStr);
             double longitude = Double.parseDouble(longitudeStr);
             graph.addVertex(graph.new CityVertex(name, population, latitude, longitude));
+            gridIndex.add(name,latitude,longitude);
             outputArea.append("Přidán vrchol: " + name + "\n");
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
@@ -212,6 +214,7 @@ public class GraphGUI extends JFrame {
 
     private void clearGraph() {
         graph.clear();
+        gridIndex = new GridIndex();
         outputArea.append("Graf byl vymazán.\n");
     }
 
@@ -221,7 +224,7 @@ public class GraphGUI extends JFrame {
 
     private void loadGraph() throws IOException, ClassNotFoundException {
         String filename = JOptionPane.showInputDialog("Zadejte název souboru:");
-        graph = Serialization.LoadFile.loadGraph(filename);
+        graph = Serialization.LoadFile.loadGraph(filename,gridIndex);
         outputArea.append("Graf načten ze souboru: " + filename + "\n");
     }
 
@@ -346,11 +349,15 @@ public class GraphGUI extends JFrame {
                 // === 1. Čísla podél osy X a Y ===
                 g2.setColor(Color.BLACK);
                 g2.setFont(new Font("Arial", Font.PLAIN, 12));
+
+                // Vykreslení čísel na ose X
                 for (int i = 0; i < horizontal.size(); i++) {
                     int xPos = (int) ((horizontal.get(i) - minX) * xScale) + padding;
                     g2.drawString(String.format("(%d) %d", i + 1, horizontal.get(i).intValue()), xPos - 10, padding - 5);
                     g2.drawString(String.valueOf(horizontal.get(i).intValue()), xPos - 5, height - 5);
                 }
+
+                // Vykreslení čísel na ose Y
                 for (int i = 0; i < vertical.size(); i++) {
                     int yPos = (int) ((vertical.get(i) - minY) * yScale) + padding;
                     g2.drawString(String.format("(%d) %d", i + 1, vertical.get(i).intValue()), 5, yPos + 4);
@@ -382,6 +389,7 @@ public class GraphGUI extends JFrame {
                             double latitude = graph.getLocation(key).getLatitude();
                             double longitude = graph.getLocation(key).getLongitude();
 
+                            // Normalizované souřadnice pro vykreslení
                             int x = (int) ((longitude - minX) * xScale) + padding;
                             int y = (int) ((latitude - minY) * yScale) + padding;
 
@@ -390,7 +398,7 @@ public class GraphGUI extends JFrame {
 
                             // Popisek vedle bodu
                             g2.drawString(
-                                    String.format("%s (%d, %d)", key, (int) longitude, (int) latitude),
+                                    String.format("%s (%d, %d)", key, (int) latitude, (int) longitude),
                                     x + 5, y - 5
                             );
                         }
@@ -402,6 +410,7 @@ public class GraphGUI extends JFrame {
         frame.add(panel);
         frame.setVisible(true);
     }
+
 
 
     private void showBigTable() {

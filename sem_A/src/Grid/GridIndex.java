@@ -4,104 +4,117 @@ import DataStructures.GeoLocation;
 import DataStructures.Graph;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 @Data
 public class GridIndex<KVertex> {
     private List<List<KVertex>> grid;
     private List<Double> vertical;
     private List<Double> horizontal;
-    private Graph graph;
+    private HashMap<KVertex, GeoLocation> vertices;
 
+    private boolean splitVertically = true;
+    private final double OFFSET = 5.0;
 
-    public GridIndex(Graph graph) {
-        this.graph = graph;
+    public GridIndex() {
         this.vertical = new ArrayList<>();
         this.horizontal = new ArrayList<>();
         this.grid = new ArrayList<>();
-        createGrid();
+        this.vertices = new HashMap<>();
     }
 
-    private void createGrid() {
-        List<KVertex> vertices = graph.getVerticesKeys();
-        PriorityQueue<Double> sortedLatitude = new PriorityQueue<>();
-        PriorityQueue<Double> sortedLongitude = new PriorityQueue<>();
-        for (KVertex vertex : vertices) {
-            double latitude = graph.getLocation(vertex).getLatitude();
-            double longitude = graph.getLocation(vertex).getLongitude();
-            sortedLatitude.add(latitude);
-            sortedLongitude.add(longitude);
-        }
+    public void add(KVertex v,Double latitude, Double longitude) {
+        vertices.put(v, new GeoLocation(latitude, longitude));
+    }
 
-        vertical.add(0.0);
-        horizontal.add(0.0);
+    public void createGrid() {
+        vertical.add(Collections.min(vertices.values(), Comparator.comparingDouble(GeoLocation::getLatitude)).getLatitude() - OFFSET);
+        vertical.add(Collections.max(vertices.values(), Comparator.comparingDouble(GeoLocation::getLatitude)).getLatitude() + OFFSET);
+        horizontal.add(Collections.min(vertices.values(), Comparator.comparingDouble(GeoLocation::getLongitude)).getLongitude() - OFFSET);
+        horizontal.add(Collections.max(vertices.values(), Comparator.comparingDouble(GeoLocation::getLongitude)).getLongitude() + OFFSET);
 
-        for (int i = 0; i < vertices.size(); i++) {
-            if (i % 2 == 0) {
-                //Vertical
-                decomposeGrid(sortedLatitude,sortedLongitude, vertical);
-            } else {
-                //Horizontal
-                decomposeGrid(sortedLongitude,sortedLatitude, horizontal);
+        vertices.forEach(this::findSpaceInGrid);
+    }
+
+    private void findSpaceInGrid(KVertex key, GeoLocation location) {
+        int row = -1;
+        int col = -1;
+
+        for (int i = 0; i < vertical.size() - 1; i++) {
+            if (location.getLatitude() >= vertical.get(i) && location.getLatitude() <= vertical.get(i + 1)) {
+                row = i;
+                break;
             }
         }
-        fillGrid();
-    }
 
-    private void fillGrid() {
-        ALL_VERTICES:
-        for (Object key : graph.getVerticesKeys()) {
-            for (int i = 0; i < vertical.size(); i++) {
-                grid.add(new ArrayList<>());
-                if (graph.getLocation(key).getLatitude() < vertical.get(i)) {
-                    for (int j = 0; j < horizontal.size(); j++) {
-                        if (graph.getLocation(key).getLongitude() < horizontal.get(j)) {
-                            while (grid.get(i - 1).size() < j - 1) {
-                                grid.get(i - 1).add(null);
-                            }
-                            grid.get(i - 1).add(j - 1, (KVertex) key);
-                            continue ALL_VERTICES;
-                        }
-                    }
+        for (int j = 0; j < horizontal.size() - 1; j++) {
+            if (location.getLongitude() >= horizontal.get(j) && location.getLongitude() <= horizontal.get(j + 1)) {
+                col = j;
+                break;
+            }
+        }
+
+        while (grid.size() <= row) {
+            grid.add(new ArrayList<>());
+        }
+
+        while (grid.get(row).size() <= col) {
+            grid.get(row).add(null);
+        }
+
+        if (grid.get(row).get(col) != null) {
+            System.out.println("Kolize v buňce na pozici [" + row + ", " + col + "]. Rozděluji...");
+
+            KVertex existing = grid.get(row).get(col);
+            grid.get(row).set(col, null); // Odstraníme původní prvek
+
+            if (vertices.get(existing).getLatitude()== vertices.get(key).getLatitude() && vertices.get(existing).getLongitude()== vertices.get(key).getLongitude()) {
+                System.out.println("stejný prvek?!");
+                return ;
+            }
+            else if (!splitVertically && vertices.get(existing).getLongitude() != vertices.get(key).getLongitude() ||
+                    vertices.get(existing).getLatitude() == vertices.get(key).getLatitude()) {
+                // Rozdělení vodorovně
+                double midLong = (vertices.get(existing).getLongitude() + vertices.get(key).getLongitude()) / 2;
+                if (!horizontal.contains(midLong)) {
+                    horizontal.add(col + 1, midLong); // Přidáme na konkrétní index
+                }
+            }else if (splitVertically && vertices.get(existing).getLatitude() != vertices.get(key).getLatitude()
+            || vertices.get(existing).getLongitude() == vertices.get(key).getLongitude()) {
+                // Rozdělení svisle
+                double midLat = (vertices.get(existing).getLatitude() + vertices.get(key).getLatitude()) / 2;
+                if (!vertical.contains(midLat)) {
+                    vertical.add(row + 1, midLat); // Přidáme na konkrétní index
                 }
             }
+
+            // Přepni způsob dělení pro příští rozdělení
+            splitVertically = !splitVertically;
+
+            // Znovu vložíme oba vrcholy do podmřížky
+            findSpaceInGrid(existing,vertices.get(existing));
+            findSpaceInGrid(key,vertices.get(key));
+        } else {
+            // Pokud je buňka prázdná, vložíme prvek
+            grid.get(row).set(col, key);
+            System.out.println("Vloženo do gridu na pozici [" + row + ", " + col + "]: " + key);
         }
     }
 
-    private void decomposeGrid(PriorityQueue<Double> sortedList,PriorityQueue<Double> secondSortedList, List<Double> splitList) {
-        if (sortedList.isEmpty()) { return;}
-        if (sortedList.size() == 1) {
-            splitList.add(sortedList.poll());
-            return;
-        }
-        @SuppressWarnings("ConstantConditions")
-        double a = sortedList.poll();
-        secondSortedList.poll();
-        @SuppressWarnings("ConstantConditions")
-        double b = sortedList.poll();
-        secondSortedList.poll();
-        //TODO zjistit možnost více vertexů v jedné bunce
-            double result = ((a + b) / 2);
-            splitList.add(result);
 
-
-    }
 
     public List<KVertex> findRange(GeoLocation start, GeoLocation end) {
         List<KVertex> outputList = new ArrayList<>();
-        ALL_VERTICES:
-        for (Object key : graph.getVerticesKeys()) {
-            for (int i = 0; i < vertical.size(); i++) {
-                if (graph.getLocation(key).getLatitude() >= start.getLatitude() &&
-                    graph.getLocation(key).getLatitude() <= end.getLatitude()) {
-                    for (int j = 0; j < horizontal.size(); j++) {
-                        if (graph.getLocation(key).getLongitude() >= start.getLongitude() &&
-                            graph.getLocation(key).getLongitude() <= end.getLongitude()) {
-                                outputList.add((KVertex) key);
-                                continue ALL_VERTICES;
-                        }
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid.get(i).size(); j++) {
+                KVertex key = grid.get(i).get(j);
+                if (key != null) {
+                    GeoLocation location = vertices.get(key);
+                    if (location.getLatitude() >= start.getLatitude() &&
+                            location.getLatitude() <= end.getLatitude() &&
+                            location.getLongitude() >= start.getLongitude() &&
+                            location.getLongitude() <= end.getLongitude()) {
+                        outputList.add(key);
                     }
                 }
             }
@@ -110,10 +123,10 @@ public class GridIndex<KVertex> {
     }
 
     public KVertex findPoint(GeoLocation location) {
-        if (findRange(location,location).size()>1) {
-            System.out.println(findRange(location,location).size());
-
+        List<KVertex> result = findRange(location, location);
+        if (result.size() > 1) {
+            System.out.println("Více prvků na stejné pozici: " + result.size());
         }
-      return findRange(location,location).getFirst();
+        return result.isEmpty() ? null : result.get(0);
     }
 }
