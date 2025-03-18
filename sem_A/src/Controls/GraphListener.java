@@ -60,7 +60,7 @@ public class GraphListener {
                     System.out.println("getTable");
                     break;
                 case "addVertex":
-                    graph.addVertex(graph.new CityVertex(parts[1], Integer.parseInt(parts[2])));
+                    //graph.addVertex(graph.new CityVertex(parts[1], Integer.parseInt(parts[2])));
                     System.out.println("Vertex added.");
                     break;
                 case "addEdge":
@@ -94,7 +94,7 @@ public class GraphListener {
                     System.out.println(graph);
                     break;
                 case "load":
-                    graph = Serialization.LoadFile.loadGraph("zadani.ser");
+                    graph = Serialization.LoadFile.loadGraph("zadani.ser",null);
                     System.out.println("Graph loaded.");
                     break;
                 case "save":

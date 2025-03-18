@@ -2,6 +2,8 @@ package Controls;
 
 import Algorithm.DijkstraAlgorithm;
 import Algorithm.DijkstraResult;
+import DataStructures.GeoLocation;
+import Grid.GridIndex;
 import Implementation.TransportGraph;
 
 import javax.swing.*;
@@ -18,13 +20,15 @@ public class GraphGUI extends JFrame {
     DijkstraResult<String> dijkstraResult;
     String sourceVector;
     private final JPanel dijkstraPanel = new JPanel();
+    private GridIndex gridIndex;
 
     DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
 
     public GraphGUI() {
         graph = new TransportGraph();
+        gridIndex = new GridIndex();
         setTitle("Graph GUI");
-        setSize(800, 600);
+        setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -84,8 +88,67 @@ public class GraphGUI extends JFrame {
         addButton(dijkstraPanel, "Get Successor Table", _ -> showSmallTable(),false);
         mainPanel.add(dijkstraPanel);
 
+        JPanel gridPanel = new JPanel();
+        gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
+        addButton(gridPanel, "Create Grid", _ -> createGrid(),true);
+        addButton(gridPanel, "Print Grid", _ -> printGrid(),true);
+        addButton(gridPanel, "Find Range", _ -> findRange(),true);
+        addButton(gridPanel, "Find Point", _ -> findPoint(),true);
+        mainPanel.add(gridPanel);
+
         add(mainPanel, BorderLayout.EAST);
 
+    }
+
+    private void findPoint() {
+        String latitudeStr = JOptionPane.showInputDialog("Zadejte latitude:");
+        String longitudeStr = JOptionPane.showInputDialog("Zadejte longitude:");
+        try {
+            double latitude = Double.parseDouble(latitudeStr);
+            double longitude = Double.parseDouble(longitudeStr);
+            GeoLocation location = new GeoLocation(latitude,longitude);
+            Object a = gridIndex.findPoint(location);
+            outputArea.append("Nalezen vrchol: " + a + "\n");
+        } catch (NumberFormatException e) {
+            showError("Chybný vstup.");
+        }
+    }
+
+    private void findRange() {
+        String latitudeStrStart = JOptionPane.showInputDialog("Zadejte latitude začátku:");
+        String longitudeStrStart = JOptionPane.showInputDialog("Zadejte longitude začátku:");
+        String latitudeStrEnd = JOptionPane.showInputDialog("Zadejte latitude konce:");
+        String longitudeStrEnd = JOptionPane.showInputDialog("Zadejte longitude konce:");
+        try {
+            double latitudeStart = Double.parseDouble(latitudeStrStart);
+            double longitudeStart = Double.parseDouble(longitudeStrStart);
+            double latitudeEnd = Double.parseDouble(latitudeStrEnd);
+            double longitudeEnd = Double.parseDouble(longitudeStrEnd);
+            GeoLocation locationStart = new GeoLocation(latitudeStart,longitudeStart);
+            GeoLocation locationEnd = new GeoLocation(latitudeEnd,longitudeEnd);
+            List list = gridIndex.findRange(locationStart,locationEnd);
+            for (Object o : list) {
+                outputArea.append("Vrchol: " + o + "\n");
+            }
+        } catch (NumberFormatException e) {
+            showError("Chybný vstup.");
+        }
+    }
+
+    private void printGrid() {
+        List<List<String>> gridIndexList = gridIndex.getGrid();
+        for (int i = 0; i < gridIndexList.size(); i++) {
+            for (int j = 0; j < gridIndexList.get(i).size(); j++) {
+                System.out.print(gridIndexList.get(i).get(j) + " ");
+            }
+            System.out.println();
+        }
+        showGridIndex();
+    }
+
+    private void createGrid() {
+        gridIndex.createGrid();
+        outputArea.append("Grid byl vytvořen.\n");
     }
 
     private void addButton(JPanel panel, String text, ActionListener action, boolean enabled) {
@@ -97,10 +160,14 @@ public class GraphGUI extends JFrame {
 
     private void addVertex() {
         String name = JOptionPane.showInputDialog("Zadejte název vrcholu:");
-        String popStr = JOptionPane.showInputDialog("Zadejte populaci:");
+        String latitudeStr = JOptionPane.showInputDialog("Zadejte latitude:");
+        String longitudeStr = JOptionPane.showInputDialog("Zadejte longitude:");
         try {
-            int population = Integer.parseInt(popStr);
-            graph.addVertex(graph.new CityVertex(name, population));
+            int population = 5;
+            double latitude = Double.parseDouble(latitudeStr);
+            double longitude = Double.parseDouble(longitudeStr);
+            graph.addVertex(graph.new CityVertex(name, population, latitude, longitude));
+            gridIndex.add(name,latitude,longitude);
             outputArea.append("Přidán vrchol: " + name + "\n");
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
@@ -146,6 +213,7 @@ public class GraphGUI extends JFrame {
 
     private void clearGraph() {
         graph.clear();
+        gridIndex = new GridIndex();
         outputArea.append("Graf byl vymazán.\n");
     }
 
@@ -155,7 +223,7 @@ public class GraphGUI extends JFrame {
 
     private void loadGraph() throws IOException, ClassNotFoundException {
         String filename = JOptionPane.showInputDialog("Zadejte název souboru:");
-        graph = Serialization.LoadFile.loadGraph(filename);
+        graph = Serialization.LoadFile.loadGraph(filename,gridIndex);
         outputArea.append("Graf načten ze souboru: " + filename + "\n");
     }
 
@@ -243,6 +311,88 @@ public class GraphGUI extends JFrame {
         tableWindow.add(scrollPane);
         tableWindow.setVisible(true);
     }
+    public void showGridIndex() {
+        JFrame frame = new JFrame("Grid Index");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(800, 800);
+
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                List<Double> horizontal = gridIndex.getHorizontal();
+                List<Double> vertical = gridIndex.getVertical();
+                List<List> verticesKeys = gridIndex.getGrid();
+
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int width = getWidth();
+                int height = getHeight();
+
+                // === Přidání odsazení od okrajů ===
+                int padding = 40;
+                int gridWidth = width - 2 * padding;
+                int gridHeight = height - 2 * padding;
+
+                // === Zjištění minima a maxima pro normalizaci ===
+                double minX = vertical.getFirst();
+                double maxX = vertical.getLast();
+                double minY = horizontal.getFirst();
+                double maxY = horizontal.getLast();
+
+                double xScale = gridWidth / (maxX - minX);
+                double yScale = gridHeight / (maxY - minY);
+
+                // === 2. Vykreslení vertikálních čar ===
+                g2.setColor(Color.RED);
+                for (int i = 0; i < vertical.size(); i++) {
+                    int xPos = (int) ((vertical.get(i) - minX) * xScale) + padding;
+                    g2.setStroke(new BasicStroke(1));
+                    g2.drawLine(xPos, padding, xPos, height - padding);
+                }
+
+                // === 3. Vykreslení horizontálních čar ===
+                g2.setColor(Color.BLUE);
+                for (int i = 0; i < horizontal.size(); i++) {
+                    int yPos = (int) ((horizontal.get(i) - minY) * yScale) + padding;
+                    g2.setStroke(new BasicStroke(1));
+                    g2.drawLine(padding, yPos, width - padding, yPos);
+                }
+
+                // === 4. Vykreslení bodů ===
+                g2.setColor(Color.BLACK);
+                for (int i = 0; i < verticesKeys.size(); i++) {
+                    for (int j = 0; j < verticesKeys.get(i).size(); j++) {
+                        String key = (String) verticesKeys.get(i).get(j);
+                        if (key != null) {
+                            double latitude = graph.getLocation(key).getLatitude();
+                            double longitude = graph.getLocation(key).getLongitude();
+
+                            // Normalizované souřadnice pro vykreslení
+                            int x = (int) ((latitude - minX) * xScale) + padding;
+                            int y = (int) ((longitude - minY) * yScale) + padding;
+
+                            // Nakreslení bodu
+                            g2.fillOval(x - 3, y - 3, 6, 6);
+
+                            // Popisek vedle bodu
+                            g2.drawString(
+                                    String.format("%s (%d, %d)", key, (int) latitude, (int) longitude),
+                                    x + 5, y - 5
+                            );
+                        }
+                    }
+                }
+            }
+        };
+
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+
+
 
     private void showBigTable() {
         JFrame tableWindow = new JFrame("Matice následníků");

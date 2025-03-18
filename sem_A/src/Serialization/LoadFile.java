@@ -1,6 +1,7 @@
 package Serialization;
 
-import DataStructures.Graph;
+import DataStructures.GeoLocation;
+import Grid.GridIndex;
 import Implementation.TransportGraph.CityVertex;
 import Implementation.TransportGraph.RoadEdge;
 import Implementation.TransportGraph;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 public class LoadFile {
-    public static TransportGraph loadGraph(String fileName) throws IOException, ClassNotFoundException {
+    public static TransportGraph loadGraph(String fileName,GridIndex<String> grid) throws IOException, ClassNotFoundException {
         TransportGraph graph = new TransportGraph();
 
         try (FileInputStream fileIn = new FileInputStream(fileName);
@@ -19,6 +20,8 @@ public class LoadFile {
             for (int i = 0; i < vertexCount; i++) {
                 CityVertex vertex = (CityVertex) in.readObject();
                 graph.addVertex(vertex);
+                GeoLocation location = vertex.getLocation();
+                grid.add(vertex.getKey(),location.getLatitude(),location.getLongitude());
             }
 
             int edgeCount = in.readInt();

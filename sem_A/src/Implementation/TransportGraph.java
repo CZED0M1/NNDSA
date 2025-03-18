@@ -18,8 +18,9 @@ public class TransportGraph extends Graph<Map.Entry<String, String>, Integer, St
     }
 
     public class CityVertex extends Vertex<String, Integer>{
-        public CityVertex(String name, Integer population) {
-            super(name, population);
+        public CityVertex(String name, Integer population, double latitude, double longitude) {
+            super(name, population,latitude,longitude);
+
         }
     }
 }

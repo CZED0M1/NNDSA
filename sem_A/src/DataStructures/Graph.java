@@ -20,13 +20,14 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
         private GeoLocation location;
         private final List<Edge<?,?>> edges = new ArrayList<>();
 
-        public Vertex(K key, V value){
+        public Vertex(K key, V value, double latitude, double longitude){
             this.key = key;
             this.value = value;
+            this.location = new GeoLocation(latitude, longitude);
         }
 
         public String toString() {
-            return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")";
+            return key.toString() + "(" + value.toString() + ") - " + "(" + edges + ")" + location;
         }
 
         public void addEdge(Edge<?,?> edge) {
@@ -75,6 +76,10 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
             throw new IllegalArgumentException("Vertex with key " + vertex.getKey() + " already exists.");
         }
         vertices.put(vertex.getKey(), vertex);
+    }
+
+    public GeoLocation getLocation(KVertex vertexKey){
+        return getVertex(vertexKey).getLocation();
     }
 
     public void addEdge(KVertex startKey, KVertex endKey, Edge<KEdge, VEdge> edge){
@@ -128,6 +133,10 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
         }
         //noinspection SuspiciousMethodCalls
         return (edges.containsKey(key)) ? edges.get(key) : edges.get(OppositeKey);
+    }
+
+    public List<KVertex> getVerticesKeys() {
+        return new ArrayList<>(vertices.keySet());
     }
 
     public String toString() {
