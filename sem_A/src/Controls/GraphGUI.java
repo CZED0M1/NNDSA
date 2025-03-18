@@ -160,11 +160,10 @@ public class GraphGUI extends JFrame {
 
     private void addVertex() {
         String name = JOptionPane.showInputDialog("Zadejte název vrcholu:");
-        String popStr = JOptionPane.showInputDialog("Zadejte populaci:");
         String latitudeStr = JOptionPane.showInputDialog("Zadejte latitude:");
         String longitudeStr = JOptionPane.showInputDialog("Zadejte longitude:");
         try {
-            int population = Integer.parseInt(popStr);
+            int population = 5;
             double latitude = Double.parseDouble(latitudeStr);
             double longitude = Double.parseDouble(longitudeStr);
             graph.addVertex(graph.new CityVertex(name, population, latitude, longitude));
@@ -338,44 +337,26 @@ public class GraphGUI extends JFrame {
                 int gridHeight = height - 2 * padding;
 
                 // === Zjištění minima a maxima pro normalizaci ===
-                double minX = horizontal.get(0);
-                double maxX = horizontal.get(horizontal.size() - 1);
-                double minY = vertical.get(0);
-                double maxY = vertical.get(vertical.size() - 1);
+                double minX = vertical.getFirst();
+                double maxX = vertical.getLast();
+                double minY = horizontal.getFirst();
+                double maxY = horizontal.getLast();
 
                 double xScale = gridWidth / (maxX - minX);
                 double yScale = gridHeight / (maxY - minY);
 
-                // === 1. Čísla podél osy X a Y ===
-                g2.setColor(Color.BLACK);
-                g2.setFont(new Font("Arial", Font.PLAIN, 12));
-
-                // Vykreslení čísel na ose X
-                for (int i = 0; i < horizontal.size(); i++) {
-                    int xPos = (int) ((horizontal.get(i) - minX) * xScale) + padding;
-                    g2.drawString(String.format("(%d) %d", i + 1, horizontal.get(i).intValue()), xPos - 10, padding - 5);
-                    g2.drawString(String.valueOf(horizontal.get(i).intValue()), xPos - 5, height - 5);
-                }
-
-                // Vykreslení čísel na ose Y
-                for (int i = 0; i < vertical.size(); i++) {
-                    int yPos = (int) ((vertical.get(i) - minY) * yScale) + padding;
-                    g2.drawString(String.format("(%d) %d", i + 1, vertical.get(i).intValue()), 5, yPos + 4);
-                    g2.drawString(String.valueOf(vertical.get(i).intValue()), width - 30, yPos + 4);
-                }
-
                 // === 2. Vykreslení vertikálních čar ===
                 g2.setColor(Color.RED);
-                for (int i = 0; i < horizontal.size(); i++) {
-                    int xPos = (int) ((horizontal.get(i) - minX) * xScale) + padding;
+                for (int i = 0; i < vertical.size(); i++) {
+                    int xPos = (int) ((vertical.get(i) - minX) * xScale) + padding;
                     g2.setStroke(new BasicStroke(1));
                     g2.drawLine(xPos, padding, xPos, height - padding);
                 }
 
                 // === 3. Vykreslení horizontálních čar ===
                 g2.setColor(Color.BLUE);
-                for (int i = 0; i < vertical.size(); i++) {
-                    int yPos = (int) ((vertical.get(i) - minY) * yScale) + padding;
+                for (int i = 0; i < horizontal.size(); i++) {
+                    int yPos = (int) ((horizontal.get(i) - minY) * yScale) + padding;
                     g2.setStroke(new BasicStroke(1));
                     g2.drawLine(padding, yPos, width - padding, yPos);
                 }
@@ -390,8 +371,8 @@ public class GraphGUI extends JFrame {
                             double longitude = graph.getLocation(key).getLongitude();
 
                             // Normalizované souřadnice pro vykreslení
-                            int x = (int) ((longitude - minX) * xScale) + padding;
-                            int y = (int) ((latitude - minY) * yScale) + padding;
+                            int x = (int) ((latitude - minX) * xScale) + padding;
+                            int y = (int) ((longitude - minY) * yScale) + padding;
 
                             // Nakreslení bodu
                             g2.fillOval(x - 3, y - 3, 6, 6);

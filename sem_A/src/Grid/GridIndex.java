@@ -70,7 +70,9 @@ public class GridIndex<KVertex> {
 
             if (vertices.get(existing).getLatitude()== vertices.get(key).getLatitude() && vertices.get(existing).getLongitude()== vertices.get(key).getLongitude()) {
                 System.out.println("stejný prvek?!");
-                return ;
+                grid.get(row).set(col, existing);
+                grid.get(row).set(col, key);
+                return;
             }
             else if (!splitVertically && vertices.get(existing).getLongitude() != vertices.get(key).getLongitude() ||
                     vertices.get(existing).getLatitude() == vertices.get(key).getLatitude()) {
