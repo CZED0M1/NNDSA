@@ -11,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
@@ -90,8 +91,7 @@ public class GraphGUI extends JFrame {
 
         JPanel gridPanel = new JPanel();
         gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
-        addButton(gridPanel, "Create Grid", _ -> createGrid(),true);
-        addButton(gridPanel, "Print Grid", _ -> printGrid(),true);
+        addButton(gridPanel, "Print Grid", _ -> showGridIndex(),true);
         addButton(gridPanel, "Find Range", _ -> findRange(),true);
         addButton(gridPanel, "Find Point", _ -> findPoint(),true);
         mainPanel.add(gridPanel);
@@ -133,22 +133,6 @@ public class GraphGUI extends JFrame {
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
         }
-    }
-
-    private void printGrid() {
-        List<List<String>> gridIndexList = gridIndex.getGrid();
-        for (int i = 0; i < gridIndexList.size(); i++) {
-            for (int j = 0; j < gridIndexList.get(i).size(); j++) {
-                System.out.print(gridIndexList.get(i).get(j) + " ");
-            }
-            System.out.println();
-        }
-        showGridIndex();
-    }
-
-    private void createGrid() {
-        gridIndex.createGrid();
-        outputArea.append("Grid byl vytvořen.\n");
     }
 
     private void addButton(JPanel panel, String text, ActionListener action, boolean enabled) {
@@ -323,7 +307,7 @@ public class GraphGUI extends JFrame {
 
                 List<Double> horizontal = gridIndex.getHorizontal();
                 List<Double> vertical = gridIndex.getVertical();
-                List<List> verticesKeys = gridIndex.getGrid();
+                List<List<Map.Entry<String,GeoLocation>>> verticesKeys = gridIndex.getGrid();
 
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -365,10 +349,13 @@ public class GraphGUI extends JFrame {
                 g2.setColor(Color.BLACK);
                 for (int i = 0; i < verticesKeys.size(); i++) {
                     for (int j = 0; j < verticesKeys.get(i).size(); j++) {
-                        String key = (String) verticesKeys.get(i).get(j);
-                        if (key != null) {
-                            double latitude = graph.getLocation(key).getLatitude();
-                            double longitude = graph.getLocation(key).getLongitude();
+                        Map.Entry<String,GeoLocation> map = verticesKeys.get(i).get(j);
+
+                        if (map != null) {
+                            String key = map.getKey();
+                            GeoLocation loc = map.getValue();
+                            double latitude = loc.getLatitude();
+                            double longitude = loc.getLongitude();
 
                             // Normalizované souřadnice pro vykreslení
                             int x = (int) ((latitude - minX) * xScale) + padding;
