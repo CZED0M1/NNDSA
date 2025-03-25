@@ -60,6 +60,7 @@ public class GridIndex<K> {
 
             if (existing.getValue().getLatitude() == location.getLatitude() && existing.getValue().getLongitude() == location.getLongitude()) {
                 System.out.println("Duplicitní bod");
+                return;
             }
 
             grid.get(row).set(col, null);
