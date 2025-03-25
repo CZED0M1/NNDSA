@@ -89,61 +89,45 @@ public class GridIndex<K> {
         }
     }
 
-        //TODO kontorola pomocí vertical a horizontal
-    public List<K> findRange(GeoLocation start,GeoLocation end) {
+    public List<K> findRange(GeoLocation start, GeoLocation end) {
         List<K> outputList = new ArrayList<>();
 
         int rowStart = -1;
         int colStart = -1;
-
         int rowEnd = -1;
         int colEnd = -1;
 
         for (int i = 0; i < vertical.size() - 1; i++) {
-            if (start.getLatitude() <= vertical.get(i)) {
+            if (start.getLatitude() >= vertical.get(i) && start.getLatitude() < vertical.get(i + 1)) {
                 rowStart = i;
-                System.out.println("rowStart: " + rowStart);
-                break;
             }
-        }
-
-        //Hledání pozice - horizontal
-        for (int j = 0; j < horizontal.size() - 1; j++) {
-            if (start.getLongitude() <= horizontal.get(j)) {
-                colStart = j;
-                System.out.println("colStart: " + colStart);
-                break;
-            }
-        }
-
-
-        for (int i = 0; i < vertical.size() - 1; i++) {
-            if (end.getLatitude() <= vertical.get(i)) {
+            if (end.getLatitude() >= vertical.get(i) && end.getLatitude() < vertical.get(i + 1)) {
                 rowEnd = i;
-                System.out.println("rowEnd: " + rowEnd);
-                break;
             }
         }
 
-        //Hledání pozice - horizontal
         for (int j = 0; j < horizontal.size() - 1; j++) {
-            if (end.getLongitude() <= horizontal.get(j)) {
-                colEnd = j;
-                System.out.println("colEnd: " + colEnd);
-                break;
+            if (start.getLongitude() >= horizontal.get(j) && start.getLongitude() < horizontal.get(j + 1)) {
+                colStart = j;
             }
+            if (end.getLongitude() >= horizontal.get(j) && end.getLongitude() < horizontal.get(j + 1)) {
+                colEnd = j;
+            }
+        }
+
+        if (rowStart == -1 || colStart == -1 || rowEnd == -1 || colEnd == -1) {
+            return outputList;
         }
 
         for (int i = rowStart; i <= rowEnd; i++) {
             for (int j = colStart; j <= colEnd; j++) {
                 if (i < grid.size() && j < grid.get(i).size() && grid.get(i).get(j) != null) {
-                    outputList.add(grid.get(i).get(j).getKey());
+                        outputList.add(grid.get(i).get(j).getKey());
                 }
             }
         }
 
         return outputList;
-
     }
 
     public K findPoint(GeoLocation location) {

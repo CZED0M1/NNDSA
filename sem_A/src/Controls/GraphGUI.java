@@ -108,7 +108,11 @@ public class GraphGUI extends JFrame {
             double longitude = Double.parseDouble(longitudeStr);
             GeoLocation location = new GeoLocation(latitude,longitude);
             Object a = gridIndex.findPoint(location);
-            outputArea.append("Nalezen vrchol: " + a + "\n");
+            if(a==null){
+                outputArea.append("Vrchol nebyl nalezen.\n");
+                return;
+            }
+            outputArea.append("Nalezený vrchol: " + a + "\n");
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
         }
