@@ -6,24 +6,29 @@ import java.util.*;
 
 @Data
 public class GridIndex<K> {
+    //FIXED - K místo KVertex
     private List<List<Map.Entry<K,GeoLocation>>> grid;
     private List<Double> vertical;
     private List<Double> horizontal;
     private boolean splitVertically = true;
+    private final Double MAX_LIMIT = 70.0;
+    private final Double MIN_LIMIT = 0.0;
 
     public GridIndex() {
         this.grid = new ArrayList<>();
         this.vertical = new ArrayList<>();
         this.horizontal = new ArrayList<>();
 
+        //FIXED - Statické hranice
         //Vložení hranic - min,max
-        vertical.addFirst(0.0);
-        vertical.addLast(70.0);
-        horizontal.addFirst(0.0);
-        horizontal.addLast(70.0);
+        vertical.addFirst(MIN_LIMIT);
+        vertical.addLast(MAX_LIMIT);
+        horizontal.addFirst(MIN_LIMIT);
+        horizontal.addLast(MAX_LIMIT);
     }
 
     public void add(K v, Double latitude, Double longitude){
+        //FIXED - vždy přidat ne jen při kliknutí generovat
         findSpaceInGrid(v, new GeoLocation(latitude, longitude));
     }
 
@@ -89,6 +94,7 @@ public class GridIndex<K> {
         }
     }
 
+    //FIXED -findRange použití hranice
     public List<K> findRange(GeoLocation start, GeoLocation end) {
         List<K> outputList = new ArrayList<>();
 
