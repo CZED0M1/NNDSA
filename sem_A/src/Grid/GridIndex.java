@@ -1,44 +1,43 @@
 package Grid;
 
-import DataStructures.GeoLocation;
+import DataStructures.Location;
 import lombok.Data;
 import java.util.*;
 
+
 @Data
 public class GridIndex<K> {
-    //FIXED - K místo KVertex
-    private List<List<Map.Entry<K,GeoLocation>>> grid;
+    private List<List<Map.Entry<K, Location>>> grid;
     private List<Double> vertical;
     private List<Double> horizontal;
     private boolean splitVertically = true;
-    private final Double MAX_LIMIT = 70.0;
-    private final Double MIN_LIMIT = 0.0;
+    private int blockingFactor;
+    private GridFile gridFile;
 
-    public GridIndex() {
+    public GridIndex(double minX, double minY,double maxX, double maxY) {
         this.grid = new ArrayList<>();
         this.vertical = new ArrayList<>();
         this.horizontal = new ArrayList<>();
+        this.gridFile = new GridFile("gridFile.bin");
+        this.blockingFactor = gridFile.getBlockingFactor();
 
-        //FIXED - Statické hranice
-        //Vložení hranic - min,max
-        vertical.addFirst(MIN_LIMIT);
-        vertical.addLast(MAX_LIMIT);
-        horizontal.addFirst(MIN_LIMIT);
-        horizontal.addLast(MAX_LIMIT);
+        vertical.addFirst(minX);
+        vertical.addLast(maxX);
+        horizontal.addFirst(minY);
+        horizontal.addLast(maxY);
     }
 
     public void add(K v, Double latitude, Double longitude){
-        //FIXED - vždy přidat ne jen při kliknutí generovat
-        findSpaceInGrid(v, new GeoLocation(latitude, longitude));
+        findSpaceInGrid(v, new Location(latitude, longitude));
     }
 
-    private void findSpaceInGrid(K key, GeoLocation location){
+    private void findSpaceInGrid(K key, Location location){
         int row = -1;
         int col = -1;
 
         //Hledání pozice - vertical
         for (int i = 0; i < vertical.size() - 1; i++) {
-            if (location.getLatitude() >= vertical.get(i) && location.getLatitude() <= vertical.get(i + 1)) {
+            if (location.getX() >= vertical.get(i) && location.getX() <= vertical.get(i + 1)) {
                 row = i;
                 break;
             }
@@ -46,7 +45,7 @@ public class GridIndex<K> {
 
         //Hledání pozice - horizontal
         for (int j = 0; j < horizontal.size() - 1; j++) {
-            if (location.getLongitude() >= horizontal.get(j) && location.getLongitude() <= horizontal.get(j + 1)) {
+            if (location.getY() >= horizontal.get(j) && location.getY() <= horizontal.get(j + 1)) {
                 col = j;
                 break;
             }
@@ -59,27 +58,32 @@ public class GridIndex<K> {
             grid.get(row).add(null);
         }
 
+        //přečti bytes
+
+        //porovnej počet s blok faktorem
+
+
         if (grid.get(row).get(col) != null) {
 
-            Map.Entry<K,GeoLocation> existing = grid.get(row).get(col);
+            Map.Entry<K, Location> existing = grid.get(row).get(col);
 
-            if (existing.getValue().getLatitude() == location.getLatitude() && existing.getValue().getLongitude() == location.getLongitude()) {
+            if (existing.getValue().getX() == location.getX() && existing.getValue().getY() == location.getY()) {
                 System.out.println("Duplicitní bod");
                 return;
             }
 
             grid.get(row).set(col, null);
 
-            if (!splitVertically && existing.getValue().getLongitude() != location.getLongitude() ||
-                    existing.getValue().getLatitude() == location.getLatitude()) {
-                double midLong = (existing.getValue().getLongitude() + location.getLongitude()) / 2;
+            if (!splitVertically && existing.getValue().getY() != location.getY() ||
+                    existing.getValue().getX() == location.getX()) {
+                double midLong = (existing.getValue().getY() + location.getY()) / 2;
                 if (!horizontal.contains(midLong)) {
                     horizontal.add(col + 1, midLong);
                 }
-            //vertikální split
-            }else if (splitVertically && existing.getValue().getLatitude() != location.getLatitude()
-            || existing.getValue().getLongitude() == location.getLongitude()) {
-                double midLat = (existing.getValue().getLatitude() + location.getLatitude()) / 2;
+                //vertikální split
+            }else if (splitVertically && existing.getValue().getX() != location.getX()
+                    || existing.getValue().getY() == location.getY()) {
+                double midLat = (existing.getValue().getX() + location.getX()) / 2;
                 if (!vertical.contains(midLat)) {
                     vertical.add(row + 1, midLat);
                 }
@@ -94,8 +98,7 @@ public class GridIndex<K> {
         }
     }
 
-    //FIXED -findRange použití hranice
-    public List<K> findRange(GeoLocation start, GeoLocation end) {
+    public List<K> findRange(Location start, Location end) {
         List<K> outputList = new ArrayList<>();
 
         int rowStart = -1;
@@ -104,19 +107,19 @@ public class GridIndex<K> {
         int colEnd = -1;
 
         for (int i = 0; i < vertical.size() - 1; i++) {
-            if (start.getLatitude() >= vertical.get(i) && start.getLatitude() < vertical.get(i + 1)) {
+            if (start.getX() >= vertical.get(i) && start.getX() < vertical.get(i + 1)) {
                 rowStart = i;
             }
-            if (end.getLatitude() >= vertical.get(i) && end.getLatitude() < vertical.get(i + 1)) {
+            if (end.getX() >= vertical.get(i) && end.getX() < vertical.get(i + 1)) {
                 rowEnd = i;
             }
         }
 
         for (int j = 0; j < horizontal.size() - 1; j++) {
-            if (start.getLongitude() >= horizontal.get(j) && start.getLongitude() < horizontal.get(j + 1)) {
+            if (start.getY() >= horizontal.get(j) && start.getY() < horizontal.get(j + 1)) {
                 colStart = j;
             }
-            if (end.getLongitude() >= horizontal.get(j) && end.getLongitude() < horizontal.get(j + 1)) {
+            if (end.getY() >= horizontal.get(j) && end.getY() < horizontal.get(j + 1)) {
                 colEnd = j;
             }
         }
@@ -128,7 +131,7 @@ public class GridIndex<K> {
         for (int i = rowStart; i <= rowEnd; i++) {
             for (int j = colStart; j <= colEnd; j++) {
                 if (i < grid.size() && j < grid.get(i).size() && grid.get(i).get(j) != null) {
-                        outputList.add(grid.get(i).get(j).getKey());
+                    outputList.add(grid.get(i).get(j).getKey());
                 }
             }
         }
@@ -136,7 +139,7 @@ public class GridIndex<K> {
         return outputList;
     }
 
-    public K findPoint(GeoLocation location) {
+    public K findPoint(Location location) {
         List<K> result = findRange(location, location);
         return result.isEmpty() ? null : result.getFirst();
     }

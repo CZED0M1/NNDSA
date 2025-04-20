@@ -1,6 +1,6 @@
 package Serialization;
 
-import DataStructures.GeoLocation;
+import DataStructures.Location;
 import Grid.GridIndex;
 import Implementation.TransportGraph.CityVertex;
 import Implementation.TransportGraph.RoadEdge;
@@ -20,8 +20,8 @@ public class LoadFile {
             for (int i = 0; i < vertexCount; i++) {
                 CityVertex vertex = (CityVertex) in.readObject();
                 graph.addVertex(vertex);
-                GeoLocation location = vertex.getLocation();
-                grid.add(vertex.getKey(),location.getLatitude(),location.getLongitude());
+                Location location = vertex.getLocation();
+                grid.add(vertex.getKey(),location.getX(),location.getY());
             }
 
             int edgeCount = in.readInt();

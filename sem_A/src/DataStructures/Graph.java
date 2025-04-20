@@ -17,13 +17,13 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
     public abstract class Vertex<K,V>  implements Serializable {
         private K key;
         private V value;
-        private GeoLocation location;
+        private Location location;
         private final List<Edge<?,?>> edges = new ArrayList<>();
 
         public Vertex(K key, V value, double latitude, double longitude){
             this.key = key;
             this.value = value;
-            this.location = new GeoLocation(latitude, longitude);
+            this.location = new Location(latitude, longitude);
         }
 
         public String toString() {
@@ -78,7 +78,7 @@ public abstract class Graph<KEdge, VEdge, KVertex, VVertex> extends DijkstraAlgo
         vertices.put(vertex.getKey(), vertex);
     }
 
-    public GeoLocation getLocation(KVertex vertexKey){
+    public Location getLocation(KVertex vertexKey){
         return getVertex(vertexKey).getLocation();
     }
 

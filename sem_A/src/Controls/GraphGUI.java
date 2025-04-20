@@ -2,7 +2,7 @@ package Controls;
 
 import Algorithm.DijkstraAlgorithm;
 import Algorithm.DijkstraResult;
-import DataStructures.GeoLocation;
+import DataStructures.Location;
 import Grid.GridIndex;
 import Implementation.TransportGraph;
 
@@ -27,7 +27,7 @@ public class GraphGUI extends JFrame {
 
     public GraphGUI() {
         graph = new TransportGraph();
-        gridIndex = new GridIndex();
+        gridIndex = new GridIndex(0.0,0.0,70.0,70.0);
         setTitle("Graph GUI");
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -106,7 +106,7 @@ public class GraphGUI extends JFrame {
         try {
             double latitude = Double.parseDouble(latitudeStr);
             double longitude = Double.parseDouble(longitudeStr);
-            GeoLocation location = new GeoLocation(latitude,longitude);
+            Location location = new Location(latitude,longitude);
             Object a = gridIndex.findPoint(location);
             if(a==null){
                 outputArea.append("Vrchol nebyl nalezen.\n");
@@ -128,8 +128,8 @@ public class GraphGUI extends JFrame {
             double longitudeStart = Double.parseDouble(longitudeStrStart);
             double latitudeEnd = Double.parseDouble(latitudeStrEnd);
             double longitudeEnd = Double.parseDouble(longitudeStrEnd);
-            GeoLocation locationStart = new GeoLocation(latitudeStart,longitudeStart);
-            GeoLocation locationEnd = new GeoLocation(latitudeEnd,longitudeEnd);
+            Location locationStart = new Location(latitudeStart,longitudeStart);
+            Location locationEnd = new Location(latitudeEnd,longitudeEnd);
             List list = gridIndex.findRange(locationStart,locationEnd);
             for (Object o : list) {
                 outputArea.append("Vrchol: " + o + "\n");
@@ -201,7 +201,6 @@ public class GraphGUI extends JFrame {
 
     private void clearGraph() {
         graph.clear();
-        gridIndex = new GridIndex();
         outputArea.append("Graf byl vymazán.\n");
     }
 
@@ -285,8 +284,8 @@ public class GraphGUI extends JFrame {
 
         // Naplnění tabulky
         for (int i = 0; i < columnNames.length; i++) {
-                String to = columnNames[i];
-                    tableData[0][i] = dijkstraResult.getPrevious().get(to);
+            String to = columnNames[i];
+            tableData[0][i] = dijkstraResult.getPrevious().get(to);
         }
         tableData[0][0]=sourceVector;
 
@@ -311,7 +310,7 @@ public class GraphGUI extends JFrame {
 
                 List<Double> horizontal = gridIndex.getHorizontal();
                 List<Double> vertical = gridIndex.getVertical();
-                List<List<Map.Entry<String,GeoLocation>>> verticesKeys = gridIndex.getGrid();
+                List<List<Map.Entry<String, Location>>> verticesKeys = gridIndex.getGrid();
 
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -353,13 +352,13 @@ public class GraphGUI extends JFrame {
                 g2.setColor(Color.BLACK);
                 for (int i = 0; i < verticesKeys.size(); i++) {
                     for (int j = 0; j < verticesKeys.get(i).size(); j++) {
-                        Map.Entry<String,GeoLocation> map = verticesKeys.get(i).get(j);
+                        Map.Entry<String,Location> map = verticesKeys.get(i).get(j);
 
                         if (map != null) {
                             String key = map.getKey();
-                            GeoLocation loc = map.getValue();
-                            double latitude = loc.getLatitude();
-                            double longitude = loc.getLongitude();
+                            Location loc = map.getValue();
+                            double latitude = loc.getX();
+                            double longitude = loc.getY();
 
                             // Normalizované souřadnice pro vykreslení
                             int x = (int) ((latitude - minX) * xScale) + padding;
