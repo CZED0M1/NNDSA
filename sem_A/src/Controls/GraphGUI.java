@@ -21,9 +21,14 @@ public class GraphGUI extends JFrame {
     DijkstraResult<String> dijkstraResult;
     String sourceVector;
     private final JPanel dijkstraPanel = new JPanel();
+
+
     private GridIndex gridIndex;
 
+
     DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
+
+    //TODO block grid - char A ++ = b
 
     public GraphGUI() {
         graph = new TransportGraph();

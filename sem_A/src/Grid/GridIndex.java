@@ -12,14 +12,11 @@ public class GridIndex<K> {
     private List<Double> horizontal;
     private boolean splitVertically = true;
     private int blockingFactor;
-    private GridFile gridFile;
 
     public GridIndex(double minX, double minY,double maxX, double maxY) {
         this.grid = new ArrayList<>();
         this.vertical = new ArrayList<>();
         this.horizontal = new ArrayList<>();
-        this.gridFile = new GridFile("gridFile.bin");
-        this.blockingFactor = gridFile.getBlockingFactor();
 
         vertical.addFirst(minX);
         vertical.addLast(maxX);
@@ -31,6 +28,7 @@ public class GridIndex<K> {
         findSpaceInGrid(v, new Location(latitude, longitude));
     }
 
+    //TODO cut
     private void findSpaceInGrid(K key, Location location){
         int row = -1;
         int col = -1;
@@ -57,11 +55,6 @@ public class GridIndex<K> {
         while (grid.get(row).size() <= col) {
             grid.get(row).add(null);
         }
-
-        //přečti bytes
-
-        //porovnej počet s blok faktorem
-
 
         if (grid.get(row).get(col) != null) {
 
