@@ -28,6 +28,7 @@ public class GridIndex<K> {
         findSpaceInGrid(v, new Location(latitude, longitude));
     }
 
+
     //TODO cut
     private void findSpaceInGrid(K key, Location location){
         int row = -1;

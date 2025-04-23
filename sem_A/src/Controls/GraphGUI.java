@@ -3,6 +3,7 @@ package Controls;
 import Algorithm.DijkstraAlgorithm;
 import Algorithm.DijkstraResult;
 import DataStructures.Location;
+import Grid.GridFile;
 import Grid.GridIndex;
 import Implementation.TransportGraph;
 
@@ -24,15 +25,14 @@ public class GraphGUI extends JFrame {
 
 
     private GridIndex gridIndex;
+    private GridFile gridFile;
 
 
     DijkstraAlgorithm<Map.Entry<String, String>, Integer, String, Integer> dijkstraAlgorithm =new DijkstraAlgorithm<>();
 
-    //TODO block grid - char A ++ = b
-
     public GraphGUI() {
         graph = new TransportGraph();
-        gridIndex = new GridIndex(0.0,0.0,70.0,70.0);
+        gridFile = new GridFile("test.bin");
         setTitle("Graph GUI");
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -113,6 +113,8 @@ public class GraphGUI extends JFrame {
             double longitude = Double.parseDouble(longitudeStr);
             Location location = new Location(latitude,longitude);
             Object a = gridIndex.findPoint(location);
+            //Object a = gridFile.findPoint();
+            //Object a = gridFile.findPoint();
             if(a==null){
                 outputArea.append("Vrchol nebyl nalezen.\n");
                 return;
@@ -136,6 +138,7 @@ public class GraphGUI extends JFrame {
             Location locationStart = new Location(latitudeStart,longitudeStart);
             Location locationEnd = new Location(latitudeEnd,longitudeEnd);
             List list = gridIndex.findRange(locationStart,locationEnd);
+            //List list = gridFile.findRange(locationStart,locationEnd);
             for (Object o : list) {
                 outputArea.append("Vrchol: " + o + "\n");
             }
@@ -160,7 +163,8 @@ public class GraphGUI extends JFrame {
             double latitude = Double.parseDouble(latitudeStr);
             double longitude = Double.parseDouble(longitudeStr);
             graph.addVertex(graph.new CityVertex(name, population, latitude, longitude));
-            gridIndex.add(name,latitude,longitude);
+            //gridIndex.add(name,latitude,longitude);
+            gridFile.addCity(name,100,latitude,longitude);
             outputArea.append("Přidán vrchol: " + name + "\n");
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
@@ -303,7 +307,7 @@ public class GraphGUI extends JFrame {
         tableWindow.add(scrollPane);
         tableWindow.setVisible(true);
     }
-    public void showGridIndex() {
+    public void showGridIndex() {//TODO show
         JFrame frame = new JFrame("Grid Index");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 800);
