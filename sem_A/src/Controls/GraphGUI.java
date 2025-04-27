@@ -112,14 +112,7 @@ public class GraphGUI extends JFrame {
             double latitude = Double.parseDouble(latitudeStr);
             double longitude = Double.parseDouble(longitudeStr);
             Location location = new Location(latitude,longitude);
-            Object a = gridIndex.findPoint(location);
-            //Object a = gridFile.findPoint();
-            //Object a = gridFile.findPoint();
-            if(a==null){
-                outputArea.append("Vrchol nebyl nalezen.\n");
-                return;
-            }
-            outputArea.append("Nalezený vrchol: " + a + "\n");
+            gridFile.findPoint(location);
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
         }
@@ -135,16 +128,20 @@ public class GraphGUI extends JFrame {
             double longitudeStart = Double.parseDouble(longitudeStrStart);
             double latitudeEnd = Double.parseDouble(latitudeStrEnd);
             double longitudeEnd = Double.parseDouble(longitudeStrEnd);
-            Location locationStart = new Location(latitudeStart,longitudeStart);
-            Location locationEnd = new Location(latitudeEnd,longitudeEnd);
-            List list = gridIndex.findRange(locationStart,locationEnd);
+            Location locationStart = new Location(latitudeStart, longitudeStart);
+            Location locationEnd = new Location(latitudeEnd, longitudeEnd);
+            // List list = gridFile.findRange(locationStart,locationEnd);
             //List list = gridFile.findRange(locationStart,locationEnd);
+            /*
             for (Object o : list) {
                 outputArea.append("Vrchol: " + o + "\n");
             }
         } catch (NumberFormatException e) {
             showError("Chybný vstup.");
         }
+
+             */
+        }catch (NumberFormatException e) {}
     }
 
     private void addButton(JPanel panel, String text, ActionListener action, boolean enabled) {
@@ -317,9 +314,9 @@ public class GraphGUI extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                List<Double> horizontal = gridIndex.getHorizontal();
-                List<Double> vertical = gridIndex.getVertical();
-                List<List<Map.Entry<String, Location>>> verticesKeys = gridIndex.getGrid();
+                List<Double> horizontal = gridFile.getGridIndex().getHorizontal();
+                List<Double> vertical = gridFile.getGridIndex().getVertical();
+                List<List<Map.Entry<String, Location>>> verticesKeys = gridFile.getGridIndex().getGrid();
 
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

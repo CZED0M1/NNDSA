@@ -28,8 +28,28 @@ public class GridIndex<K> {
         findSpaceInGrid(v, new Location(latitude, longitude));
     }
 
+    public int[] findIndexInGrid(Location location) {
+        int row = -1;
+        int col = -1;
 
-    //TODO cut
+        //Hledání pozice - vertical
+        for (int i = 0; i < vertical.size() - 1; i++) {
+            if (location.getX() >= vertical.get(i) && location.getX() <= vertical.get(i + 1)) {
+                row = i;
+                break;
+            }
+        }
+
+        //Hledání pozice - horizontal
+        for (int j = 0; j < horizontal.size() - 1; j++) {
+            if (location.getY() >= horizontal.get(j) && location.getY() <= horizontal.get(j + 1)) {
+                col = j;
+                break;
+            }
+        }
+        return new int[]{row, col};
+    }
+
     private void findSpaceInGrid(K key, Location location){
         int row = -1;
         int col = -1;
