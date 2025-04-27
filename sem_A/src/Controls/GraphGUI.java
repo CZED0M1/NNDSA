@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -99,10 +100,20 @@ public class GraphGUI extends JFrame {
         addButton(gridPanel, "Print Grid", _ -> showGridIndex(),true);
         addButton(gridPanel, "Find Range", _ -> findRange(),true);
         addButton(gridPanel, "Find Point", _ -> findPoint(),true);
+        addButton(gridPanel,"Delete City", _ -> deleteCity(),true);
         mainPanel.add(gridPanel);
 
         add(mainPanel, BorderLayout.EAST);
 
+    }
+
+    private void deleteCity() {
+        String latitudeStr = JOptionPane.showInputDialog("Zadejte latitude:");
+        String longitudeStr = JOptionPane.showInputDialog("Zadejte longitude:");
+        double latitude = Double.parseDouble(latitudeStr);
+        double longitude = Double.parseDouble(longitudeStr);
+        Location location = new Location(latitude,longitude);
+        gridFile.deleteCity(location);
     }
 
     private void findPoint() {
@@ -130,7 +141,7 @@ public class GraphGUI extends JFrame {
             double longitudeEnd = Double.parseDouble(longitudeStrEnd);
             Location locationStart = new Location(latitudeStart, longitudeStart);
             Location locationEnd = new Location(latitudeEnd, longitudeEnd);
-            // List list = gridFile.findRange(locationStart,locationEnd);
+            gridFile.findRange(locationStart,locationEnd);
             //List list = gridFile.findRange(locationStart,locationEnd);
             /*
             for (Object o : list) {
@@ -304,7 +315,7 @@ public class GraphGUI extends JFrame {
         tableWindow.add(scrollPane);
         tableWindow.setVisible(true);
     }
-    public void showGridIndex() {//TODO show
+    public void showGridIndex() {
         JFrame frame = new JFrame("Grid Index");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 800);
@@ -316,7 +327,7 @@ public class GraphGUI extends JFrame {
 
                 List<Double> horizontal = gridFile.getGridIndex().getHorizontal();
                 List<Double> vertical = gridFile.getGridIndex().getVertical();
-                List<List<Map.Entry<String, Location>>> verticesKeys = gridFile.getGridIndex().getGrid();
+                List<List<AbstractMap.SimpleEntry<Byte, Location>>> verticesKeys = gridFile.getGridIndex().getGrid();
 
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -358,11 +369,15 @@ public class GraphGUI extends JFrame {
                 g2.setColor(Color.BLACK);
                 for (int i = 0; i < verticesKeys.size(); i++) {
                     for (int j = 0; j < verticesKeys.get(i).size(); j++) {
-                        Map.Entry<String,Location> map = verticesKeys.get(i).get(j);
+                       // Map.Entry<Byte,Location> map = verticesKeys.get(i).get(j);
+                        List<AbstractMap.SimpleEntry<String,Location>> map =   gridFile.getCities(i,j);
 
-                        if (map != null) {
-                            String key = map.getKey();
-                            Location loc = map.getValue();
+                        for (int k=0; k < gridFile.getBlockingFactor();k++) {
+
+
+                        if (map.get(k) != null) {
+                            String key = map.get(k).getKey();
+                            Location loc =  map.get(k).getValue();
                             double latitude = loc.getX();
                             double longitude = loc.getY();
 
@@ -378,6 +393,7 @@ public class GraphGUI extends JFrame {
                                     String.format("%s (%d, %d)", key, (int) latitude, (int) longitude),
                                     x + 5, y - 5
                             );
+                        }
                         }
                     }
                 }

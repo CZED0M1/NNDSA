@@ -2,12 +2,14 @@ package Grid;
 
 import DataStructures.Location;
 import lombok.Data;
+
+import java.io.Serializable;
 import java.util.*;
 
 
 @Data
-public class GridIndex<K> {
-    private List<List<Map.Entry<K, Location>>> grid;
+public class GridIndex<K> implements Serializable {
+    private List<List<AbstractMap.SimpleEntry<K, Location>>> grid;
     private List<Double> vertical;
     private List<Double> horizontal;
     private boolean splitVertically = true;
@@ -28,7 +30,7 @@ public class GridIndex<K> {
         findSpaceInGrid(v, new Location(latitude, longitude));
     }
 
-    public int[] findIndexInGrid(Location location) {
+    public K findIndexInGrid(Location location) {
         int row = -1;
         int col = -1;
 
@@ -47,8 +49,13 @@ public class GridIndex<K> {
                 break;
             }
         }
-        return new int[]{row, col};
+        if (row == -1 || col == -1) {
+            return null;
+        }
+
+        return grid.get(row).get(col).getKey();
     }
+
 
     private void findSpaceInGrid(K key, Location location){
         int row = -1;
@@ -79,7 +86,7 @@ public class GridIndex<K> {
 
         if (grid.get(row).get(col) != null) {
 
-            Map.Entry<K, Location> existing = grid.get(row).get(col);
+            AbstractMap.SimpleEntry<K, Location> existing = grid.get(row).get(col);
 
             if (existing.getValue().getX() == location.getX() && existing.getValue().getY() == location.getY()) {
                 System.out.println("Duplicitní bod");
@@ -108,7 +115,7 @@ public class GridIndex<K> {
             findSpaceInGrid(existing.getKey(),existing.getValue());
             findSpaceInGrid(key,location);
         } else {
-            grid.get(row).set(col, Map.entry(key,location));
+            grid.get(row).set(col, new AbstractMap.SimpleEntry(key,location));
         }
     }
 
@@ -152,6 +159,10 @@ public class GridIndex<K> {
 
         return outputList;
     }
+
+
+
+
 
     public K findPoint(Location location) {
         List<K> result = findRange(location, location);

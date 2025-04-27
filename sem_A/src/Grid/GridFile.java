@@ -7,10 +7,12 @@ import javax.swing.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class GridFile {
+public class GridFile implements Serializable {
     private final String fileName;
     private final int citySizeInBytes = 30 + 4 + 8 + 8; // cityName + population + latitude + longitude
     private final int numOfStringChars = 30;
@@ -25,10 +27,11 @@ public class GridFile {
     private byte numberOfBlocks;
     private byte firstFreeBlock;
 
-    private GridIndex<String> gridIndex;
+    private GridIndex<Byte> gridIndex;
 
     public GridFile(String fileName) {
         this.fileName = fileName;
+        File indexFile = new File(fileName + "_index.dat");
         this.buffer = new byte[blockSize + headerSize];
         this.gridIndex = new GridIndex<>(0.0, 0.0, 70.0, 70.0);
 
@@ -49,7 +52,16 @@ public class GridFile {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        // Načtení GridIndex
+        if (indexFile.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(indexFile))) {
+                gridIndex = (GridIndex<Byte>) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
 
     private void loadControlBlock() {
         try (RandomAccessFile raf = new RandomAccessFile(fileName, "r")) {
@@ -107,16 +119,19 @@ public class GridFile {
 
         byte count = byteBuffer.get(0);
         if (count == 0 && firstFreeBlock == 0) {
-            gridIndex.add(cityName,latitude,longitude);
+            gridIndex.add(firstFreeBlock,latitude,longitude);
+            saveGridIndex();
         }
 
         if (count >= blockingFactor) {
             createBlock();
             addCity(cityName, population, latitude, longitude);
-            gridIndex.add(cityName,latitude,longitude);
+            gridIndex.add(firstFreeBlock,latitude,longitude);
             readBlock(firstFreeBlock - 1);
+            saveGridIndex();
             return;
         }
+
 
         int offset = headerSize + count * citySizeInBytes;
         byteBuffer.position(offset);
@@ -133,7 +148,6 @@ public class GridFile {
         byteBuffer.put(0, (byte) (count + 1)); // aktualizuj počet záznamů
 
         writeBlock(firstFreeBlock);
-        readCity(firstFreeBlock, 0);
     }
 
     public void readCity(int blockIndex, int cityIndex) {
@@ -161,121 +175,142 @@ public class GridFile {
         System.out.println("Longitude: " + longitude);
     }
 
-    private int findCityIndex(int block, Location location) {
-        readBlock(block); // Načteme blok podle jeho indexu
-        byte count = byteBuffer.get(0); // Počet měst v tomto bloku
 
-        // Pokud je count menší než 1, znamená to, že v bloku nejsou žádná města
-        if (count <= 0) {
-            System.out.println("No cities in this block.");
-            return -1;
+    public void findRange(Location locationStart, Location locationEnd) {
+        Byte startIndex = gridIndex.findIndexInGrid(locationStart);
+        Byte endIndex = gridIndex.findIndexInGrid(locationEnd);
+
+
+        StringBuilder message= new StringBuilder();
+            for (int blockIndex = startIndex; blockIndex <= endIndex; blockIndex++) {
+                readBlock(blockIndex);
+
+                byte count = byteBuffer.get(0);
+                if (count <= 0) {
+                    continue; // Tento blok je prázdný
+                }
+
+                for (int cityIndex = 0; cityIndex < count; cityIndex++) {
+                    int offset = headerSize + cityIndex * citySizeInBytes;
+                    byteBuffer.position(offset);
+
+                    byte[] cityNameBytes = new byte[numOfStringChars];
+                    byteBuffer.get(cityNameBytes);
+                    String cityName = new String(cityNameBytes, StandardCharsets.UTF_8).trim();
+                    int population = byteBuffer.getInt();
+                    double latitude = byteBuffer.getDouble();
+                    double longitude = byteBuffer.getDouble();
+
+                    // Podmínka, zda je město v zadaném rozsahu
+                    if (latitude >= locationStart.getX() && latitude <= locationEnd.getX() &&
+                            longitude >= locationStart.getY() && longitude <= locationEnd.getY()) {
+                        if(!cityName.isEmpty()) {
+
+
+                            message.append("---" + "City: ").append(cityName).append("\n").append("Population: ").append(population).append("\n").append("Latitude: ").append(latitude).append("\n").append("Longitude: ").append(longitude).append("\n");
+                        }
+                    }
+                }
+            }
+        JTextArea textArea = new JTextArea(String.valueOf(message));
+        textArea.setEditable(false);  // Textové pole nebude editovatelné
+        textArea.setWrapStyleWord(true);  // Slova se budou lámat na nový řádek
+        textArea.setLineWrap(true);
+        JScrollPane scrollPane = new JScrollPane(textArea);  // Scroll bar pro text
+        JOptionPane.showMessageDialog(null, scrollPane, "Detail města", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void saveGridIndex() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName + "_index.dat"))) {
+            oos.writeObject(gridIndex);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        // Projdeme všechna města v bloku
-        for (int i = 0; i < count; i++) {
+    public List<AbstractMap.SimpleEntry<String,Location>> getCities(int  row, int col) {
+        Byte index = gridIndex.getGrid().get(row).get(col).getKey();
+        List<AbstractMap.SimpleEntry<String,Location>> cities = new ArrayList<>();
+        for (int i=0; i<blockingFactor; i++) {
+
+            readBlock(index);
+
+            byte count = byteBuffer.get(0);
+            if (i >= count) {
+                System.out.println("City index out of range.");
+            }
+
             int offset = headerSize + i * citySizeInBytes;
             byteBuffer.position(offset);
 
-            // Načteme data města
             byte[] cityNameBytes = new byte[numOfStringChars];
             byteBuffer.get(cityNameBytes);
-            byteBuffer.getInt(); // Přečteme populaci, ale nebudeme ji používat
+            String cityName = new String(cityNameBytes, StandardCharsets.UTF_8).trim();
+            int population = byteBuffer.getInt();
             double latitude = byteBuffer.getDouble();
             double longitude = byteBuffer.getDouble();
 
-            // Porovnáme souřadnice města s těmi, které hledáme
-            if (latitude == location.getX() && longitude == location.getY()) {
-                return i; // Pokud najdeme město s odpovídajícími souřadnicemi, vrátíme index
-            }
-        }
+            cities.add(new AbstractMap.SimpleEntry<>(cityName,new Location(latitude,longitude)));
 
-        // Pokud nenajdeme město s odpovídajícími souřadnicemi, vrátíme -1
-        return -1;
+        }
+        return cities;
     }
 
-    public void getCity(int blockNumber, Location location) {
-        // Získejte index bloku v gridu
-        int[] blockIndex = gridIndex.findIndexInGrid(location);
-        if (blockIndex == null || blockIndex.length != 2) {
-            JOptionPane.showMessageDialog(null, "Invalid location.");
-            return;
-        }
+    public void deleteCity(Location location) {
+        Byte index = gridIndex.findIndexInGrid(location);
+        readBlock(index);
 
-        int row = blockIndex[0];
-        int col = blockIndex[1];
-
-        // Kontrola validity indexu a null hodnot
-        if (gridIndex.getGrid() == null ||
-                gridIndex.getGrid().size() <= row ||
-                gridIndex.getGrid().get(row) == null ||
-                gridIndex.getGrid().get(row).size() <= col) {
-            JOptionPane.showMessageDialog(null, "Grid index out of range.");
-            return;
-        }
-
-        // Načteme blok podle blockNumber
-        readBlock(blockNumber);
-
-        byte count = byteBuffer.get(0); // Počet měst v bloku
+        byte count = byteBuffer.get(0);
         if (count <= 0) {
-            JOptionPane.showMessageDialog(null, "No cities in this block.");
+            return; // Tento blok je prázdný
+        }
+
+        for (int cityIndex = 0; cityIndex < count; cityIndex++) {
+            int offset = headerSize + cityIndex * citySizeInBytes;
+            byteBuffer.position(offset);
+
+            byte[] cityNameBytes = new byte[numOfStringChars];
+            byteBuffer.get(cityNameBytes);
+            String cityName = new String(cityNameBytes, StandardCharsets.UTF_8).trim();
+            int population = byteBuffer.getInt();
+            double latitude = byteBuffer.getDouble();
+            double longitude = byteBuffer.getDouble();
+
+            // Podmínka, zda je město v zadaném rozsahu
+            if (latitude == location.getX() && longitude == location.getY()) {
+
+
+                deleteCity(index,cityIndex);
+
+            }
+
+        }
+    }
+
+    private void deleteCity(int blockIndex,int cityIndex) {
+
+        byte count = byteBuffer.get(0);
+        if (cityIndex >= count) {
+            System.out.println("City index out of range.");
             return;
         }
 
-        // Hledáme město podle souřadnic
-        int cityIndex = findCityIndex(blockNumber, location);
-
-        if (cityIndex == -1 || cityIndex >= count) {
-            JOptionPane.showMessageDialog(null, "City index out of range.");
-            return;
-        }
-
-        // Výpočet offsetu pro dané město
         int offset = headerSize + cityIndex * citySizeInBytes;
-
-        // Ochrana proti zápornému offsetu
-        if (offset < 0 || offset >= buffer.length) {
-            JOptionPane.showMessageDialog(null, "Invalid offset.");
-            return;
-        }
-
         byteBuffer.position(offset);
 
-        // Načteme údaje o městě
-        byte[] cityNameBytes = new byte[numOfStringChars];
-        byteBuffer.get(cityNameBytes);
-        String cityName = new String(cityNameBytes, StandardCharsets.UTF_8).trim();
-        int population = byteBuffer.getInt();
-        double latitude = byteBuffer.getDouble();
-        double longitude = byteBuffer.getDouble();
 
-        // Sestavení textu pro zobrazení v JOptionPane
-        String message = "City: " + cityName + "\n" +
-                "Population: " + population + "\n" +
-                "Latitude: " + latitude + "\n" +
-                "Longitude: " + longitude;
+        byteBuffer.put(new byte[30]);
+        byteBuffer.put(new byte[4]);
+        byteBuffer.put(new byte[8]);
+        byteBuffer.put(new byte[8]);
+        writeBlock(blockIndex);
 
-        // Zobrazení dialogu s informacemi
-        JOptionPane.showMessageDialog(null, message);
     }
+
 
 
     public void findPoint(Location location) {
-        int[] index = gridIndex.findIndexInGrid(location);
-        if (index == null || index.length != 2 || index[0] < 0 || index[1] < 0) {
-            JOptionPane.showMessageDialog(null, "Invalid location.");
-            return;
-        }
-
-        int row = index[0];
-        int col = index[1];
-
-        if (gridIndex.getGrid() == null || gridIndex.getGrid().size() <= row || gridIndex.getGrid().get(row) == null || gridIndex.getGrid().get(row).size() <= col) {
-            JOptionPane.showMessageDialog(null, "Grid index out of range.");
-            return;
-        }
-
-        int blockIndex = row * gridIndex.getGrid().get(row).size() + col;
-        getCity(blockIndex, location);
+        findRange(location, location);
+        
     }
 }
